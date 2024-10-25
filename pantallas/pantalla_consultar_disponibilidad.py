@@ -1,0 +1,95 @@
+from datetime import datetime
+import tkinter as tk
+from tkinter import messagebox
+
+class Habitacion:
+    def __init__(self, numero, tipo, estado, precio_por_noche):
+        self.numero = numero
+        self.tipo = tipo  # Puede ser 'simple', 'doble', o 'suite'
+        self.estado = estado  # 'disponible' o 'ocupada'
+        self.precio_por_noche = precio_por_noche
+        self.fechas_ocupadas = []
+
+    def agregar_reserva(self, fecha_entrada, fecha_salida):
+        self.fechas_ocupadas.append((fecha_entrada, fecha_salida))
+
+    def esta_disponible(self, fecha_consulta):
+        for fecha_entrada, fecha_salida in self.fechas_ocupadas:
+            if fecha_entrada <= fecha_consulta <= fecha_salida:
+                return False
+        return True
+
+    def __str__(self):
+        return f'Habitación {self.numero} - Tipo: {self.tipo} - Estado: {self.estado} - Precio: {self.precio_por_noche} por noche'
+
+
+class SistemaGestionHabitaciones:
+    def __init__(self):
+        self.habitaciones = []
+
+    def registrar_habitacion(self, numero, tipo, estado, precio_por_noche):
+        nueva_habitacion = Habitacion(numero, tipo, estado, precio_por_noche)
+        self.habitaciones.append(nueva_habitacion)
+        print(f"Habitación {numero} registrada exitosamente.")
+
+    def consultar_disponibilidad(self, fecha):
+        habitaciones_disponibles = [habitacion for habitacion in self.habitaciones if habitacion.esta_disponible(fecha)]
+        return habitaciones_disponibles
+
+
+class InterfazConsultaDisponibilidad:
+    def __init__(self, root, sistema_gestion_habitaciones):
+        self.root = root
+        self.root.title("Consulta de Disponibilidad de Habitaciones")
+        self.sistema_gestion_habitaciones = sistema_gestion_habitaciones
+
+        # Etiqueta y campo de entrada para la fecha
+        tk.Label(root, text="Fecha de Consulta (YYYY-MM-DD):").grid(row=0, column=0)
+        self.entry_fecha = tk.Entry(root)
+        self.entry_fecha.grid(row=0, column=1)
+
+        # Botón para consultar disponibilidad
+        tk.Button(root, text="Consultar Disponibilidad", command=self.consultar_disponibilidad).grid(row=1, column=0, columnspan=2)
+
+        # Área de texto para mostrar habitaciones disponibles
+        self.resultado = tk.Text(root, width=50, height=10, state='disabled')
+        self.resultado.grid(row=2, column=0, columnspan=2)
+
+    def consultar_disponibilidad(self):
+        # Obtener la fecha ingresada
+        fecha_texto = self.entry_fecha.get()
+        try:
+            fecha_consulta = datetime.strptime(fecha_texto, "%Y-%m-%d").date()
+        except ValueError:
+            messagebox.showerror("Error", "Formato de fecha incorrecto. Use YYYY-MM-DD.")
+            return
+
+        # Consultar disponibilidad en el sistema de gestión de habitaciones
+        habitaciones_disponibles = self.sistema_gestion_habitaciones.consultar_disponibilidad(fecha_consulta)
+
+        # Mostrar los resultados
+        self.resultado.config(state='normal')
+        self.resultado.delete(1.0, tk.END)
+
+        if habitaciones_disponibles:
+            for habitacion in habitaciones_disponibles:
+                self.resultado.insert(tk.END, f"{habitacion}\n")
+        else:
+            self.resultado.insert(tk.END, "No hay habitaciones disponibles para esta fecha.")
+
+        self.resultado.config(state='disabled')
+
+
+# Ejemplo de uso
+root = tk.Tk()
+root.minsize(400, 200)
+sistema_gestion_habitaciones = SistemaGestionHabitaciones()
+sistema_gestion_habitaciones.registrar_habitacion(101, "doble", "disponible", 150.0)
+sistema_gestion_habitaciones.registrar_habitacion(102, "suite", "disponible", 300.0)
+
+# Agregamos algunas reservas para probar
+sistema_gestion_habitaciones.habitaciones[0].agregar_reserva(datetime(2024, 10, 25).date(), datetime(2024, 10, 27).date())
+sistema_gestion_habitaciones.habitaciones[1].agregar_reserva(datetime(2024, 10, 26).date(), datetime(2024, 10, 28).date())
+
+InterfazConsultaDisponibilidad(root, sistema_gestion_habitaciones)
+root.mainloop()
