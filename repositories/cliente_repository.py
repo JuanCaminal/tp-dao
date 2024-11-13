@@ -7,11 +7,11 @@ class ClienteRepository:
 
     def get_all(self):
         cursor = self.db.cursor()
-        cursor.execute("SELECT id, nombre, apellido, direccion, telefono, email FROM clientes")
+        cursor.execute("SELECT id_cliente, nombre, apellido, direccion, telefono, email FROM clientes")
         clientes_data = cursor.fetchall()
 
         # Transformar las tuplas en objetos Cliente
-        clientes = [Cliente(id=data[0], nombre=data[1], apellido=data[2], direccion=data[3], telefono=data[4], email=data[5]) for data
+        clientes = [Cliente(id_cliente=data[0], nombre=data[1], apellido=data[2], direccion=data[3], telefono=data[4], email=data[5]) for data
                     in
                     clientes_data]
 
@@ -20,9 +20,9 @@ class ClienteRepository:
     def get_by_id(self, id):
         conn = self.db.get_db()
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM clientes WHERE id = ?', (id,))
+        cursor.execute('SELECT * FROM clientes WHERE id_cliente = ?', (id,))
         cliente_data = cursor.fetchone()
-        cliente = Cliente(id=cliente_data[0], nombre=cliente_data[1], apellido=cliente_data[2],direccion=cliente_data[3],telefono=cliente_data[4], email=cliente_data[5])
+        cliente = Cliente(id_cliente=cliente_data[0], nombre=cliente_data[1], apellido=cliente_data[2],direccion=cliente_data[3],telefono=cliente_data[4], email=cliente_data[5])
 
         return cliente
 
@@ -36,13 +36,13 @@ class ClienteRepository:
 
     def update(self, id, cliente):
         cursor = self.db.cursor()
-        cursor.execute('UPDATE clientes SET nombre = ?, apellido = ?, dni = ?, telefono = ?, email = ? WHERE id = ?',
+        cursor.execute('UPDATE clientes SET nombre = ?, apellido = ?, dni = ?, telefono = ?, email = ? WHERE id_cliente = ?',
                        (cliente.nombre, cliente.apellido, cliente.dni, cliente.telefono, cliente.email, id))
         self.db.commit()
         return cursor.rowcount
 
     def delete(self, id):
         cursor = self.db.cursor()
-        cursor.execute('DELETE FROM clientes WHERE id = ?', (id,))
+        cursor.execute('DELETE FROM clientes WHERE id_cliente = ?', (id,))
         self.db.commit()
         return cursor.rowcount
