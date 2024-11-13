@@ -25,7 +25,7 @@ class DBConnect:
     def crear_tablas(self):
         cursor = self.db.cursor()
         
-        # Crear tablas (método anterior)
+        # Tabla de clientes
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS clientes (
                 id_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,6 +36,8 @@ class DBConnect:
                 email TEXT
             )
         """)
+        
+        # Tabla de empleados
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS empleados (
                 id_empleado INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,6 +47,8 @@ class DBConnect:
                 sueldo REAL
             )
         """)
+        
+        # Tabla de habitaciones
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS habitaciones (
                 numero INTEGER PRIMARY KEY,
@@ -53,6 +57,8 @@ class DBConnect:
                 precio_por_noche REAL
             )
         """)
+        
+        # Tabla de reservas
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS reservas (
                 id_reserva INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,6 +71,8 @@ class DBConnect:
                 FOREIGN KEY(habitacion_numero) REFERENCES habitaciones(numero)
             )
         """)
+        
+        # Tabla de facturas
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS factura (
                 id_factura INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -76,4 +84,19 @@ class DBConnect:
                 FOREIGN KEY(reserva_id) REFERENCES reservas(id_reserva)
             )
         """)
+        
+        # Nueva tabla para asignar empleados a habitaciones
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS empleados_habitaciones (
+                id_asignacion INTEGER PRIMARY KEY AUTOINCREMENT,
+                empleado_id INTEGER,
+                habitacion_numero INTEGER,
+                fecha_asignacion TEXT,
+                tarea TEXT,
+                FOREIGN KEY(empleado_id) REFERENCES empleados(id_empleado),
+                FOREIGN KEY(habitacion_numero) REFERENCES habitaciones(numero)
+            )
+        """)
+        
+        # Confirmar los cambios
         self.db.commit()
