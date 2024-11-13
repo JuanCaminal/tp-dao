@@ -27,7 +27,7 @@ class DBConnect:
         
         # Crear tablas (método anterior)
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS cliente (
+            CREATE TABLE IF NOT EXISTS clientes (
                 id_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre TEXT NOT NULL,
                 apellido TEXT NOT NULL,
@@ -37,7 +37,7 @@ class DBConnect:
             )
         """)
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS empleado (
+            CREATE TABLE IF NOT EXISTS empleados (
                 id_empleado INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre TEXT NOT NULL,
                 apellido TEXT NOT NULL,
@@ -46,23 +46,23 @@ class DBConnect:
             )
         """)
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS habitacion (
+            CREATE TABLE IF NOT EXISTS habitaciones (
                 numero INTEGER PRIMARY KEY,
-                tipo TEXT NOT NULL,
-                estado TEXT,
+                tipo TEXT CHECK(tipo IN ('Simple', 'Doble', 'Suite')) NOT NULL,
+                estado TEXT CHECK(estado IN ('Disponible', 'Ocupada')) NOT NULL,
                 precio_por_noche REAL
             )
         """)
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS reserva (
+            CREATE TABLE IF NOT EXISTS reservas (
                 id_reserva INTEGER PRIMARY KEY AUTOINCREMENT,
                 cliente_id INTEGER,
                 habitacion_numero INTEGER,
                 fecha_entrada TEXT,
                 fecha_salida TEXT,
                 cantidad_personas INTEGER,
-                FOREIGN KEY(cliente_id) REFERENCES cliente(id_cliente),
-                FOREIGN KEY(habitacion_numero) REFERENCES habitacion(numero)
+                FOREIGN KEY(cliente_id) REFERENCES clientes(id_cliente),
+                FOREIGN KEY(habitacion_numero) REFERENCES habitaciones(numero)
             )
         """)
         cursor.execute("""
@@ -72,8 +72,8 @@ class DBConnect:
                 reserva_id INTEGER,
                 fecha_emision TEXT,
                 total REAL,
-                FOREIGN KEY(cliente_id) REFERENCES cliente(id_cliente),
-                FOREIGN KEY(reserva_id) REFERENCES reserva(id_reserva)
+                FOREIGN KEY(cliente_id) REFERENCES clientes(id_cliente),
+                FOREIGN KEY(reserva_id) REFERENCES reservas(id_reserva)
             )
         """)
         self.db.commit()

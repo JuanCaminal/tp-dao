@@ -6,7 +6,7 @@ from pantallas.helpers.window_size_helper import WindowSizeHelper
 from clases.cliente import Cliente
 
 
-# from services.cliente_service import ClienteService
+from services.cliente_service import ClienteService
 
 class RegistrarCliente(ctk.CTkToplevel):
     def __init__(self, db):
@@ -15,7 +15,7 @@ class RegistrarCliente(ctk.CTkToplevel):
         ctk.set_default_color_theme("dark-blue")
 
         self.db = db
-        # self.cliente_service = ClienteService(db)
+        self.cliente_service = ClienteService(db)
         self.title('Registrar Cliente')
         self.clientes = []
 
@@ -93,13 +93,9 @@ class RegistrarCliente(ctk.CTkToplevel):
 
         try:
             # Logica de registro
-            # self.cliente_service.create(cliente_data)
-            # messagebox.showinfo('Registro exitoso', 'El cliente se ha registrado correctamente.')
-            # self.limpiar_campos()
-
-            
-            # self.cliente = Cliente(self.entry_nombre.get(), self.entry_apellido.get(), self.entry_direccion.get(), self.entry_telefono.get(), self.entry_email.get())
-            # self.clientes.append(cliente)
+            self.cliente_service.create(cliente_data)
+            messagebox.showinfo('Registro exitoso', 'El cliente se ha registrado correctamente.')
+            self.limpiar_campos()
 
             print("Cliente registrado!")
         except Exception as e:
@@ -121,53 +117,9 @@ class RegistrarCliente(ctk.CTkToplevel):
         self.entry_email.delete(0, "end")
 
     # Función para actualizar la tabla de clientes
-    def actualizar_tabla_clientes():
-        for row in tabla_clientes.get_children():
-            self.tabla_clientes.delete(row)
-        for cliente in clientes:
-            self.tabla_clientes.insert("", "end", values=(cliente.id_cliente, cliente.nombre, cliente.apellido, cliente.direccion, cliente.telefono, cliente.email))
+    # def actualizar_tabla_clientes():
+    #     for row in tabla_clientes.get_children():
+    #         self.tabla_clientes.delete(row)
+    #     for cliente in clientes:
+    #         self.tabla_clientes.insert("", "end", values=(cliente.id_cliente, cliente.nombre, cliente.apellido, cliente.direccion, cliente.telefono, cliente.email))
         
-        
-
-
-
-
-# # Clase Cliente
-# class Cliente:
-#     def __init__(self, id_cliente, nombre, apellido, direccion, telefono, email):
-#         self.id_cliente = id_cliente
-#         self.nombre = nombre
-#         self.apellido = apellido
-#         self.direccion = direccion
-#         self.telefono = telefono
-#         self.email = email
-
-# # Lista para almacenar clientes
-# clientes = []
-
-# # Función para registrar un cliente
-# def registrar_cliente():
-    
-
-    
-#     # Actualizar la tabla
-#     actualizar_tabla_clientes()
-
-    
-    
-
-
-
-# def RegistrarCliente (self, db):
-#     # Crear ventana para Clientes
-#     frame = tk.Tk()
-#     frame.title("Registro de Clientes")
-
-    
-
-   
-
-    
-
-#     # Iniciar loop
-#     frame.mainloop()
