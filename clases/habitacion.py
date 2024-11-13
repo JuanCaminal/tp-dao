@@ -37,6 +37,6 @@ class Habitacion:
         self._precio_por_noche = precio
     
     # ir a bd y registrar habitacion
-    def registrar_habitacion():
+    def registrar_habitacion(self):
         ...
         
