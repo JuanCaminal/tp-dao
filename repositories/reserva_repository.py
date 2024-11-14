@@ -29,7 +29,7 @@ class ReservaRepository:
         query = """
             SELECT id_reserva, cliente_id, habitacion_numero, fecha_entrada, fecha_salida, cantidad_personas 
             FROM reservas 
-            WHERE fecha_entrada >= ? AND fecha_salida <= ?
+            WHERE fecha_salida >= ? AND fecha_entrada<= ?
         """
         cursor.execute(query, (fecha_inicio, fecha_fin))
         reservas_data = cursor.fetchall()

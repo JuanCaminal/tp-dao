@@ -43,3 +43,30 @@ class HabitacionRepository:
         cursor.execute('DELETE FROM habitaciones WHERE numero = ?', (numero,))
         self.db.commit()
         return cursor.rowcount
+
+    def get_diponibles_by_date_range(self, fecha_inicio, fecha_fin):
+        cursor = self.db.cursor()
+        query = """
+                SELECT numero, tipo, estado, precio_por_noche
+                FROM habitaciones
+                WHERE numero NOT IN (
+                    SELECT habitacion_numero
+                    FROM reservas
+                    WHERE (fecha_entrada < ? AND fecha_salida > ?)
+                )
+            """
+        cursor.execute(query, (fecha_fin, fecha_inicio))
+        habitaciones_data = cursor.fetchall()
+
+        # Transformar los resultados en objetos Habitacion
+        habitaciones_disponibles = [
+            Habitacion(
+                numero=data[0],
+                tipo=data[1],
+                estado=data[2],
+                precio_por_noche=data[3]
+            )
+            for data in habitaciones_data
+        ]
+
+        return habitaciones_disponibles

@@ -25,3 +25,6 @@ class HabitacionService:
 
     def delete(self, numero):
         return self.habitacion_repository.delete(numero)
+
+    def get_habitaciones_disponibles_by_date_range(self, fecha_inicio, fecha_fin):
+        return self.habitacion_repository.get_diponibles_by_date_range(fecha_inicio, fecha_fin)
