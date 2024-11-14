@@ -11,6 +11,9 @@ class ReservaService:
     def get_by_id(self, id):
         return self.reserva_repository.get_by_id(id)
 
+    def get_reservas_by_date_range(self, fecha_inicio, fecha_fin):
+        return self.reserva_repository.get_by_date_range(fecha_inicio, fecha_fin)
+
     def create(self, reserva):
         reserva = Reserva(
             cliente=reserva['cliente'],

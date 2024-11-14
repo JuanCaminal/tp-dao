@@ -10,9 +10,8 @@ class ReservaRepository:
         reservas_data = cursor.fetchall()
 
         # Transformar las tuplas en objetos Reserva
-        reservas = [Reserva(id_reserva=data[0], cliente=data[1], habitacion=data[2], fecha_entrada=data[3], fecha_salida=data[4], cantidad_personas=data[5]) for data
-                    in
-                    reservas_data]
+        reservas = [Reserva(id_reserva=data[0], cliente=data[1], habitacion=data[2], fecha_entrada=data[3], fecha_salida=data[4], cantidad_personas=data[5])
+                    for data in reservas_data]
 
         return reservas
 
@@ -24,6 +23,31 @@ class ReservaRepository:
         reserva = Reserva(id_reserva=reserva_data[0], cliente=reserva_data[1], habitacion=reserva_data[2], fecha_entrada=reserva_data[3], fecha_salida=reserva_data[4], cantidad_personas=reserva_data[5])
 
         return reserva
+
+    def get_by_date_range(self, fecha_inicio, fecha_fin):
+        cursor = self.db.cursor()
+        query = """
+            SELECT id_reserva, cliente_id, habitacion_numero, fecha_entrada, fecha_salida, cantidad_personas 
+            FROM reservas 
+            WHERE fecha_entrada >= ? AND fecha_salida <= ?
+        """
+        cursor.execute(query, (fecha_inicio, fecha_fin))
+        reservas_data = cursor.fetchall()
+
+        # Transformar los resultados en objetos Reserva
+        reservas = [
+            Reserva(
+                id_reserva=data[0],
+                cliente=data[1],
+                habitacion=data[2],
+                fecha_entrada=data[3],
+                fecha_salida=data[4],
+                cantidad_personas=data[5]
+            )
+            for data in reservas_data
+        ]
+
+        return reservas
 
     def create(self, reserva):
         conn = self.db.get_db()
