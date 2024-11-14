@@ -1,4 +1,6 @@
 import customtkinter as ctk
+
+from pantallas.pantalla_buscar_reservas import BuscarReservas
 from pantallas.pantalla_cliente import RegistrarCliente
 from pantallas.pantalla_habitacion import RegistrarHabitacion
 from pantallas.pantalla_reserva import RegistrarReserva
@@ -43,6 +45,7 @@ class PantallaPrincipal(ctk.CTk):
             ("Registrar Habitación", self.abrir_registrar_habitacion),
             ("Registrar Cliente", self.abrir_registrar_cliente),
             ("Registrar Reserva", self.abrir_registrar_reserva),
+            ("Buscar Reservas", self.abrir_buscar_reservas),
             ("Registrar Factura", self.abrir_registrar_vendedor),
             ("Asignar Empleados a habitación", self.abrir_registrar_servicio),
             ("Consultar Disponibilidad de habitaciones", self.consultar_autos_vendidos),
@@ -75,6 +78,10 @@ class PantallaPrincipal(ctk.CTk):
     def abrir_registrar_reserva(self):
         registrar_reserva = RegistrarReserva(self.db)
         registrar_reserva.grab_set()
+
+    def abrir_buscar_reservas(self):
+        buscar_reservas = BuscarReservas(self.db)
+        buscar_reservas.grab_set()
 
     def abrir_registrar_vendedor(self):
         pass

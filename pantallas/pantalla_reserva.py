@@ -22,7 +22,7 @@ class RegistrarReserva(ctk.CTkToplevel):
         self.geometry("1100x800")  # Ajustar el tamaño
         self.minsize(1100, 800)
 
-        self.tamaño_fuente = 14
+        self.tamanio_fuente = 14
         self.fuente = "Arial"
         self.width = 250
 
@@ -47,28 +47,28 @@ class RegistrarReserva(ctk.CTkToplevel):
         # Etiquetas y campos de entrada
 
         ctk.CTkLabel(frame, text="Cliente:",
-                     font=(self.fuente, self.tamaño_fuente)
+                     font=(self.fuente, self.tamanio_fuente)
                      ).grid(row=1, column=0, padx=10, pady=10)
         self.combo_cliente = ctk.CTkComboBox(frame, values=[f"{cliente.nombre} {cliente.apellido}" for cliente in
                                                             self.clientes]
-                                             , width=self.width, font=(self.fuente, self.tamaño_fuente))
+                                             , width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.combo_cliente.grid(row=1, column=1, padx=10, pady=10)
         self.combo_cliente.set("Seleccione un cliente")
 
         ctk.CTkLabel(frame, text="Habitación:",
-                     font=(self.fuente, self.tamaño_fuente,)
+                     font=(self.fuente, self.tamanio_fuente,)
                      ).grid(row=2, column=0, padx=10, pady=10)
         self.combo_habitacion = ctk.CTkComboBox(frame,
                                                 values=[f"{habitacion.numero} - {habitacion.tipo}" for habitacion in
                                                         self.habitaciones]
-                                                , width=self.width, font=(self.fuente, self.tamaño_fuente))
+                                                , width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.combo_habitacion.grid(row=2, column=1, padx=10, pady=10)
         self.combo_habitacion.set("Seleccione una habitación")
 
         ctk.CTkLabel(frame, text="Fecha de Entrada (dd/mm/YYYY):",
-                     font=(self.fuente, self.tamaño_fuente)
+                     font=(self.fuente, self.tamanio_fuente)
                      ).grid(row=3, column=0, rowspan=2, padx=10, pady=10)
-        self.entry_fecha_entrada = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamaño_fuente))
+        self.entry_fecha_entrada = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.entry_fecha_entrada.insert(0, self.fecha_actual())
         self.entry_fecha_entrada.grid(row=3, column=1, padx=10, pady=10)
         self.open_calendar_fecha_entrada = ctk.CTkButton(frame, text="Seleccionar Fecha",
@@ -77,8 +77,8 @@ class RegistrarReserva(ctk.CTkToplevel):
 
 
         ctk.CTkLabel(frame, text="Fecha de Salida (dd/mm/YYYY):",
-                     font=(self.fuente, self.tamaño_fuente)).grid(row=5, column=0, rowspan=2, padx=10, pady=10)
-        self.entry_fecha_salida = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamaño_fuente))
+                     font=(self.fuente, self.tamanio_fuente)).grid(row=5, column=0, rowspan=2, padx=10, pady=10)
+        self.entry_fecha_salida = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.entry_fecha_salida.grid(row=5, column=1, padx=10, pady=10)
 
         self.open_calendar_fecha_salida = ctk.CTkButton(frame, text="Seleccionar Fecha",
@@ -86,9 +86,9 @@ class RegistrarReserva(ctk.CTkToplevel):
         self.open_calendar_fecha_salida.grid(row=6, column=1, padx=10, pady=10)
 
         ctk.CTkLabel(frame, text="Cantidad de Personas:",
-                     font=(self.fuente, self.tamaño_fuente)
+                     font=(self.fuente, self.tamanio_fuente)
                      ).grid(row=7, column=0, padx=10, pady=10)
-        self.entry_cantidad_personas = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamaño_fuente))
+        self.entry_cantidad_personas = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.entry_cantidad_personas.grid(row=7, column=1, padx=10, pady=10)
 
         # Botón para registrar reserva
@@ -163,6 +163,32 @@ class RegistrarReserva(ctk.CTkToplevel):
                 break
 
         habitacion_nro = int(habitacion_nro_tipo.split(" - ")[0])
+        habitacion_tipo = habitacion_nro_tipo.split(" - ")[1]
+
+        # Validar fechas y validar que la cantidad de personas no exceda la que permite la habitacion
+        if fecha_entrada > fecha_salida:
+            messagebox.showerror("Error", "Por favor ingrese una fecha válida")
+            return
+
+        # Obtener el tipo de habitacion
+        match habitacion_tipo.lower():
+            case "simple":
+                if int(cantidad_personas) > 1:
+                    messagebox.showerror("Error", "Por favor ingrese una cantidad de personas valida")
+                    return
+            case "doble":
+                if int(cantidad_personas) > 2:
+                    messagebox.showerror("Error", "Por favor ingrese una cantidad de personas valida")
+                    return
+            case "suite":
+                if int(cantidad_personas) > 4:
+                    messagebox.showerror("Error", "Por favor ingrese una cantidad de personas valida")
+                    return
+            case _:
+                print("Tipo de habitación no valida")
+                messagebox.showerror("Error", "Lo sentimos ocurrio un error de base de datos")
+                return
+
 
         reserva_data = {
             "cliente": cliente_id,
