@@ -1,96 +1,99 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QGridLayout, QPushButton, QLabel
-from PyQt5.QtGui import QIcon, QFont, QPixmap
-from PyQt5 import QtCore
-from reportes import ReportesWindow  
+import tkinter as tk
+from tkinter import ttk
+from tkinter.font import Font
+from PIL import Image, ImageTk
+from reportes import ReportesWindow
 
 
-class MainWindow(QMainWindow):
+class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("UTN Hotel")
-        self.setWindowIcon(QIcon("C:\\Users\\admin\\Downloads\\Unv\\recursos\\UTN_logo.ico"))
+        self.title("UTN Hotel")
+        self.geometry("1100x700")
+        self.resizable(False, False)  
+        self.iconbitmap("C:\\Users\\admin\\Downloads\\Unv\\recursos\\UTN_logo.ico")
 
-        background_label = QLabel(self)
-        pixmap = QPixmap("C:\\Users\\admin\\Downloads\\Unv\\recursos\\fotor-20241113224158.jpg")
-        background_label.setPixmap(pixmap)
-        background_label.setScaledContents(True)
-        background_label.setGeometry(0, 0, 700, 500)
+        bg_image = Image.open("C:\\Users\\admin\\Downloads\\Unv\\tp-dao\\recursos\\fotor-20241115194144.jpg")
+        bg_image = bg_image.resize((1100, 700), Image.LANCZOS)
+        self.bg_photo = ImageTk.PhotoImage(bg_image)
 
-        title = QLabel("MENU PRINCIPAL", self)
-        title.setFont(QFont("Sans-serif", 18, QFont.Bold))
-        title.setAlignment(QtCore.Qt.AlignCenter)
-        title.setStyleSheet("color: white;")  
+        background_label = tk.Label(self, image=self.bg_photo)
+        background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-        reportes_button = QPushButton("Reportes")
+        
+  
 
-        reportes_button.clicked.connect(self.open_reportes_window)
-
-
-        grid_layout = QGridLayout()
-
+        # Configuración de botones
         buttons_info = [
-            ("Registrar \nHabitaciones", "C:\\Users\\admin\\Downloads\\Unv\\recursos\\cama-individual.png"),
+            ("Registrar \nHabitaciones", "C:\\Users\\admin\\Downloads\\Unv\\tp-dao\\recursos\\habitacion.png"),
             ("Registrar \nClientes", "C:\\Users\\admin\\Downloads\\Unv\\recursos\\personas.png"),
-            ("Registrar \nReservas", "C:\\Users\\admin\\Downloads\\Unv\\recursos\\reserva.png"),
-            ("Registrar \nFacturas", "C:\\Users\\admin\\Downloads\\Unv\\recursos\\cuenta.png"),
+            ("Registrar \nReservas", "C:\\Users\\admin\\Downloads\\Unv\\tp-dao\\recursos\\reserva.png"),
+            ("Registrar \nFacturas", "C:\\Users\\admin\\Downloads\\Unv\\tp-dao\\recursos\\factura.png"),
             ("  Asignar\nEmpleados\nHabitaciones", "C:\\Users\\admin\\Downloads\\Unv\\recursos\\desempleo.png"),
             ("Disponibilidad\nHabitaciones", "C:\\Users\\admin\\Downloads\\Unv\\recursos\\firmar.png"),
         ]
 
+        grid_frame = tk.Frame(self, bg="#18171c")  # Sin fondo
+        grid_frame.pack(expand=True, pady=10)
+
         row, col = 0, 0
         for name, icon_path in buttons_info:
-            button = QPushButton(name)
-            button.setIcon(QIcon(icon_path))
-            button.setIconSize(QtCore.QSize(30, 30))
-            button.setFixedSize(125, 100)
-            button.setFont(QFont("Sans-serif", 10))
-            button.setStyleSheet("background-color: white; color: #333; border: 1px solid #DDD; padding: 8px;")
+            # Icono del botón
+            icon_image = Image.open(icon_path).resize((40, 40), Image.LANCZOS)
+            icon_photo = ImageTk.PhotoImage(icon_image)
 
-            grid_layout.addWidget(button, row, col)
+            button = tk.Button(
+                grid_frame,
+                text=name,
+                image=icon_photo,
+                compound="top",
+                font=Font(family="Sans-serif", size=11),
+                bg="#282828",  # Fondo oscuro del botón
+                fg="white",  # Texto en blanco
+                activebackground="#444444",  # Color de fondo al presionar
+                activeforeground="white",  # Color del texto al presionar
+                bd=0,  # Sin borde
+                width=170,
+                height=150,
+                command=lambda n=name: self.button_clicked(n)
+            )
+            button.image = icon_photo  # Mantener referencia para evitar que se elimine
+            button.grid(row=row, column=col, padx=10, pady=10)
 
             col += 1
             if col > 2:
                 col = 0
                 row += 1
 
-        reportes_button = QPushButton("Reportes")
-        reportes_button.setIcon(QIcon("C:\\Users\\admin\\Downloads\\Unv\\recursos\\reporte.png"))
-        reportes_button.setIconSize(QtCore.QSize(30, 30))
-        reportes_button.setFixedSize(125, 100)
-        reportes_button.setFont(QFont("Sans-serif", 10))
-        reportes_button.setStyleSheet("background-color: white; color: #333; border: 1px solid #DDD; padding: 8px;")
+        # Botón de Reportes centrado
+        report_icon = Image.open("C:\\Users\\admin\\Downloads\\Unv\\tp-dao\\recursos\\dinero.png").resize((40, 40), Image.LANCZOS)
+        report_photo = ImageTk.PhotoImage(report_icon)
 
-        grid_layout.addWidget(reportes_button, row, 1, 1, 2)
+        reportes_button = tk.Button(
+            grid_frame,
+            text="Reportes",
+            image=report_photo,
+            compound="top",
+            font=Font(family="Sans-serif", size=11),
+            bg="#282828",  # Fondo oscuro del botón
+            fg="white",  # Texto en blanco
+            activebackground="#444444",  # Color de fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            bd=0,  # Sin borde
+            width=170,
+            height=150,
+            command=self.open_reportes_window
+        )
+        reportes_button.image = report_photo
+        reportes_button.grid(row=row + 1, column=1, columnspan=1, pady=20)  # Centrar en la última fila
 
-        reportes_button.clicked.connect(self.open_reportes_window)
+    def button_clicked(self, name):
+        print(f"Botón '{name}' presionado")
 
-        main_layout = QVBoxLayout()
-        main_layout.addWidget(title)
-        main_layout.addLayout(grid_layout)
-
-        container = QWidget()
-        container.setLayout(main_layout)
-
-        self.setCentralWidget(container)
-        background_label.lower()
-                
     def open_reportes_window(self):
-        # Crear y mostrar la ventana de reportes
-        self.reportes_window = ReportesWindow()
-        self.reportes_window.show()
-        
-        
-        
-
-
-
+        reportes_window = ReportesWindow()
+        reportes_window.show()
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-
-    window = MainWindow()
-    window.setFixedSize(700, 600)
-    window.show()
-
-    app.exec_()
+    app = MainWindow()
+    app.mainloop()
