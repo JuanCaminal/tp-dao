@@ -2,6 +2,7 @@ import customtkinter as ctk
 
 from pantallas.pantalla_asignar_empleado import AsignarEmpleadoXHabitacion
 from pantallas.pantalla_buscar_reservas import BuscarReservas
+from pantallas.pantalla_factura import EmitirFactura
 from pantallas.pantalla_registrar_cliente import RegistrarCliente
 from pantallas.pantalla_consultar_disponibilidad import ConsultarDisponibilidad
 from pantallas.pantalla_habitacion import RegistrarHabitacion
@@ -19,8 +20,8 @@ class PantallaPrincipal(ctk.CTk):
         self.title("Menú Principal - Sistema de Gestión de Hotel")
 
         # Pantalla programando actualmente
-        # asignar_empleado_x_habitacion = AsignarEmpleadoXHabitacion(db)
-        # asignar_empleado_x_habitacion.grab_set()
+        # registrar_factura = EmitirFactura(self.db)
+        # registrar_factura.grab_set()
 
         # Configuración de tema oscuro
         ctk.set_appearance_mode("dark")
@@ -75,7 +76,8 @@ class PantallaPrincipal(ctk.CTk):
 
 
     def abrir_registrar_factura(self):
-        pass
+        registrar_factura = EmitirFactura(self.db)
+        registrar_factura.grab_set()
 
     def abrir_asignar_empleado(self):
         asignar_empleado_x_habitacion = AsignarEmpleadoXHabitacion(self.db)

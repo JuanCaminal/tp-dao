@@ -63,7 +63,7 @@ class ReporteService:
         tipos = ['Simple', 'Doble', 'Suite']
         ocupadas = [
             ocupacion_por_tipo['simple']['ocupadas'],
-            ocupacion_por_tipo['doble']['ocupadas'],
+            ocupacion_por_tipo['doble']['disponibles'],
             ocupacion_por_tipo['suite']['ocupadas']
         ]
 
@@ -103,3 +103,6 @@ class ReporteService:
 
         doc.build(elements)
         print("Reporte generado: reporte_ocupacion_promedio.pdf")
+
+    def generar_reporte_ingresos_por_habitaciones(self):
+        pass

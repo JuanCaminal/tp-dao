@@ -80,7 +80,7 @@ class RegistrarHabitacion(ctk.CTkToplevel):
         self.tabla_habitaciones.column("precio", width=250)
 
         # Botón para registrar la habitación
-        ctk.CTkButton(frame, text="Registrar Habitación", command=self.registrar_habitacion,
+        ctk.CTkButton(frame, text="Registrar Habitación", command=self.registrar_o_modificar_habitacion,
                       font=(self.fuente, self.tamanio_fuente)
                       ).grid(row=5, column=0, columnspan=2, pady=10)
 
@@ -92,18 +92,41 @@ class RegistrarHabitacion(ctk.CTkToplevel):
         self.actualizar_tabla()
 
 
-    def registrar_habitacion(self):
+    def registrar_o_modificar_habitacion(self):
         numero = self.entry_numero.get()
         tipo = self.combo_tipo.get()
         estado = self.combo_estado.get()
+        # estado = "Disponible"
         precio = self.entry_precio.get()
 
-        # Validaciones simples
+        if not numero:
+            messagebox.showerror("Error", "Debe seleccionar el numero de habitacion")
+            return
+
+        try:
+            habitacion_existente = None
+            habitacion_existente = self.habitacion_service.get_by_id(numero)
+            print("1222")
+
+            if habitacion_existente != None:
+                print("holaaaa")
+                self.modificar_habitacion(numero, tipo, estado, precio)
+
+            else:
+                self.registrar_habitacion(numero, tipo, estado, precio)
+            self.limpiar_campos()
+
+        except Exception as e:
+            messagebox.showerror('Error', f'No se pudo registrar la habitación: {e}')
+
+
+    def registrar_habitacion(self, numero, tipo, estado, precio):
         if tipo == "Seleccione un tipo" or estado == "Seleccione un estado":
             messagebox.showerror("Error", "Debe seleccionar un tipo y un estado")
             return
-        if not numero or not precio:
-            messagebox.showerror("Error", "Debe completar todos los campos")
+
+        if not precio:
+            messagebox.showerror("Error", "Debe ponerle un precio a una nueva habitacion")
             return
 
         habitacion_data = {
@@ -112,13 +135,32 @@ class RegistrarHabitacion(ctk.CTkToplevel):
             "estado": estado,
             "precio": precio
         }
-        # Logica de registro de habitacion
-        try:
-            self.habitacion_service.create(habitacion_data)
-            messagebox.showinfo("Registro exitoso", "Habitación registrada correctamente")
-            self.limpiar_campos()
-        except Exception as e:
-            messagebox.showerror('Error', f'No se pudo registrar la habitación: {e}')
+
+        self.habitacion_service.create(habitacion_data)
+        messagebox.showinfo("Registro exitoso", "Habitación registrada correctamente")
+
+    def modificar_habitacion(self, numero, tipo, estado, precio):
+
+        if tipo == "Seleccione un tipo" and estado == "Seleccione un estado":
+            messagebox.showerror("Error", "Debe seleccionar un tipo o un estado, para modificar una habitacion")
+            return
+
+        if tipo == "Seleccione un tipo":
+            tipo = None
+        if estado == "Seleccione un estado":
+            estado = None
+
+
+        habitacion_data = {
+            "numero": numero,
+            "tipo": tipo,
+            "estado": estado,
+            "precio": precio
+        }
+
+        self.habitacion_service.update(numero, habitacion_data)
+        messagebox.showinfo("Modificacion exitosa", "Habitación modificada correctamente")
+
 
     def actualizar_tabla(self):
         for row in self.tabla_habitaciones.get_children():
@@ -132,3 +174,4 @@ class RegistrarHabitacion(ctk.CTkToplevel):
         self.combo_tipo.set("Seleccione un tipo")
         self.combo_estado.set("Seleccione un estado")
         self.actualizar_tabla()
+

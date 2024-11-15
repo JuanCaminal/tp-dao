@@ -19,6 +19,9 @@ class HabitacionRepository:
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM habitaciones WHERE numero = ?', (numero,))
         habitacion_data = cursor.fetchone()
+
+        if habitacion_data is None:
+            return None
         habitacion = Habitacion(numero=habitacion_data[0], tipo=habitacion_data[1], estado=habitacion_data[2], precio_por_noche=habitacion_data[3])
 
         return habitacion
@@ -32,11 +35,20 @@ class HabitacionRepository:
         return cursor.lastrowid
 
     def update(self, numero, habitacion):
-        cursor = self.db.cursor()
-        cursor.execute('UPDATE habitaciones SET tipo = ?, estado = ?, precio_por_noche = ? WHERE numero = ?',
-                       (habitacion.tipo, habitacion.estado, habitacion.precio_por_noche, numero))
-        self.db.commit()
+        conn = self.db.get_db()  # Asegúrate de obtener la conexión correctamente
+        cursor = conn.cursor()
+        cursor.execute(
+            'UPDATE habitaciones SET tipo = ?, estado = ?, precio_por_noche = ? WHERE numero = ?',
+            (habitacion.tipo, habitacion.estado, habitacion.precio_por_noche, numero)
+        )
+        conn.commit()
         return cursor.rowcount
+
+        # cursor = self.db.cursor()
+        # cursor.execute('UPDATE habitaciones SET tipo = ?, estado = ?, precio_por_noche = ? WHERE numero = ?',
+        #                (habitacion.tipo, habitacion.estado, habitacion.precio_por_noche, numero))
+        # self.db.commit()
+        # return cursor.rowcount
 
     def delete(self, numero):
         cursor = self.db.cursor()

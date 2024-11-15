@@ -23,7 +23,33 @@ class HabitacionService:
         return self.habitacion_repository.create(habitacion)
 
     def update(self, numero, habitacion):
-        return self.habitacion_repository.update(numero, habitacion)
+        habitacion_actual = self.habitacion_repository.get_by_id(numero)
+
+        if not habitacion_actual:
+            print(f"Habitación con número {numero} no encontrada.")
+            return None
+
+        # Mantener los valores anteriores si los nuevos son vacíos o no están presentes
+        tipo = habitacion['tipo'] if habitacion['tipo'] else habitacion_actual.tipo
+        estado = habitacion['estado'] if habitacion['estado'] else habitacion_actual.estado
+        precio = habitacion['precio'] if habitacion['precio'] else habitacion_actual.precio_por_noche
+
+        habitacion_actualizada = Habitacion(
+            numero=numero,
+            tipo=tipo,
+            estado=estado,
+            precio_por_noche=precio
+        )
+        """"
+        habitacion = Habitacion(
+            numero=habitacion['numero'],
+            tipo=habitacion['tipo'],
+            estado=habitacion['estado'],
+            precio_por_noche=habitacion['precio']
+        )
+        """
+
+        return self.habitacion_repository.update(numero, habitacion_actualizada)
 
     def delete(self, numero):
         return self.habitacion_repository.delete(numero)

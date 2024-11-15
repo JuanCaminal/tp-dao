@@ -32,6 +32,7 @@ class RegistrarReserva(ctk.CTkToplevel):
 
         self.clientes = self.cliente_service.get_all()
         self.habitaciones = self.habitacion_service.get_all()
+        self.reservas = self.reserva_service.get_all()
 
         # Crear widgets con estilo y valores por defecto
         self.crear_widgets()
@@ -165,9 +166,16 @@ class RegistrarReserva(ctk.CTkToplevel):
         habitacion_nro = int(habitacion_nro_tipo.split(" - ")[0])
         habitacion_tipo = habitacion_nro_tipo.split(" - ")[1]
 
+        fecha_entrada = datetime.strptime(fecha_entrada, "%d/%m/%Y").strftime("%Y-%m-%d")
+        fecha_salida = datetime.strptime(fecha_salida, "%d/%m/%Y").strftime("%Y-%m-%d")
+
         # Validar fechas y validar que la cantidad de personas no exceda la que permite la habitacion
         if fecha_entrada > fecha_salida:
             messagebox.showerror("Error", "Por favor ingrese una fecha válida")
+            return
+
+        if fecha_entrada < self.fecha_actual():
+            messagebox.showerror("Error", "Por favor ingrese una fecha posterior a la fecha actual")
             return
 
         # Obtener el tipo de habitacion
@@ -189,8 +197,10 @@ class RegistrarReserva(ctk.CTkToplevel):
                 messagebox.showerror("Error", "Lo sentimos ocurrio un error de base de datos")
                 return
 
-        fecha_entrada = datetime.strptime(fecha_entrada, "%d/%m/%Y").strftime("%Y-%m-%d")
-        fecha_salida = datetime.strptime(fecha_salida, "%d/%m/%Y").strftime("%Y-%m-%d")
+
+        if not self.verificar_disponibilidad_habitacion(habitacion_nro, fecha_entrada, fecha_salida):
+            messagebox.showinfo("Habitacion ocupada", "La habitacion no esta disponible en la fecha solicitada. \n Por favor, seleccione otra habitacion o seleccione una fecha distinta. ")
+            return
 
         reserva_data = {
             "cliente": cliente_id,
@@ -227,3 +237,11 @@ class RegistrarReserva(ctk.CTkToplevel):
                                                           f"{habitacion.numero} - {habitacion.tipo}",
                                                           reserva.fecha_entrada, reserva.fecha_salida,
                                                           reserva.cantidad_personas))
+
+    def verificar_disponibilidad_habitacion(self, habitacion_nro, fecha_entrada, fecha_salida):
+
+        for reserva in self.reservas:
+            if reserva.habitacion == habitacion_nro and (reserva.fecha_entrada <= fecha_entrada <= reserva.fecha_salida or reserva.fecha_entrada <= fecha_salida <= reserva.fecha_salida):
+                return False
+
+        return True

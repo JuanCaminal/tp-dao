@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from tkinter import messagebox
 
 from pantallas.pantalla_asignar_empleado import AsignarEmpleadoXHabitacion
 from pantallas.pantalla_buscar_reservas import BuscarReservas
@@ -40,8 +41,8 @@ class PantallaReportes(ctk.CTkToplevel):
         # Botones del menú
         botones = [
             ("Listar Reservas", self.abrir_reporte_reservas),
-            ("Ingresos por habitaciones", self.abrir_registrar_cliente),
-            ("Ocupacion Promedio", self.abrir_reporte_ocupacion_promedio),
+            ("Ingresos por habitaciones", self.generar_reporte_ingresos_por_habitaciones),
+            ("Ocupacion Promedio", self.generar_reporte_ocupacion_promedio),
         ]
 
         for texto, comando in botones:
@@ -59,11 +60,20 @@ class PantallaReportes(ctk.CTkToplevel):
         buscar_reservas = BuscarReservas(self.db)
         buscar_reservas.grab_set()
 
-    def abrir_registrar_cliente(self):
-        registrar_cliente = RegistrarCliente(self.db)
-        registrar_cliente.grab_set()
-
-    def abrir_reporte_ocupacion_promedio(self):
+    def generar_reporte_ingresos_por_habitaciones(self):
         """Llama al servicio para generar el reporte de ocupación promedio."""
-        self.reporte_service.generar_reporte_ocupacion_promedio()
-        print("Reporte de ocupación promedio generado con éxito")
+        try:
+            self.reporte_service.generar_reporte_ingresos_por_habitaciones()
+
+            messagebox.showinfo("Reporte exitoso", "Reporte de Ingresos por habitaciones generado con éxito")
+        except Exception as e:
+            messagebox.showerror('Error', f'No se pudo generar el reporte: {e}')
+
+    def generar_reporte_ocupacion_promedio(self):
+        """Llama al servicio para generar el reporte de ocupación promedio."""
+        try:
+            self.reporte_service.generar_reporte_ocupacion_promedio()
+
+            messagebox.showinfo("Reporte exitoso", "Reporte de ocupación promedio generado con éxito")
+        except Exception as e:
+            messagebox.showerror('Error', f'No se pudo generar el reporte: {e}')
