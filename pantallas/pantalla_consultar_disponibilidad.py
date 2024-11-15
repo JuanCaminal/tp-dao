@@ -5,7 +5,6 @@ import customtkinter as ctk
 from datetime import datetime
 
 from pantallas.helpers.window_size_helper import WindowSizeHelper
-from pantallas.pantalla_asignacion_empleados import habitaciones
 from services.habitacion_service import HabitacionService
 from services.reserva_service import ReservaService
 
@@ -43,9 +42,7 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
         # Titulo
         ctk.CTkLabel(frame, text='Consultar Disponibilidad Habitaciones', font=("Arial", 18)).grid(row=0, column=0, columnspan=2, pady=20)
 
-        ctk.CTkLabel(frame, text="Habitación:",
-                     font=(self.fuente, self.tamanio_fuente,)
-                     ).grid(row=1, column=0, padx=10, pady=10)
+
         self.combo_habitacion = ctk.CTkComboBox(frame,
                                                 values=[f"{habitacion.numero} - {habitacion.tipo}" for habitacion in
                                                         self.habitaciones]
@@ -55,23 +52,23 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
 
         ctk.CTkLabel(frame, text="Fecha de Inicio (dd/mm/YYYY):",
                      font=(self.fuente, self.tamanio_fuente)
-                     ).grid(row=2, column=0, padx=10, pady=10)
+                     ).grid(row=1, column=0, padx=10, pady=10)
 
         self.entry_fecha_inicio = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.entry_fecha_inicio.insert(0, self.fecha_actual())
-        self.entry_fecha_inicio.grid(row=2, column=1, padx=10, pady=10)
+        self.entry_fecha_inicio.grid(row=1, column=1, padx=10, pady=10)
         self.open_calendar_fecha_inicio = ctk.CTkButton(frame, text="Seleccionar Fecha",
                                                         command=lambda: self.open_calendar("fecha_entrada"))
-        self.open_calendar_fecha_inicio.grid(row=3, column=1, padx=10, pady=10)
+        self.open_calendar_fecha_inicio.grid(row=2, column=1, padx=10, pady=10)
 
         ctk.CTkLabel(frame, text="Fecha de Salida (dd/mm/YYYY):",
-                     font=(self.fuente, self.tamanio_fuente)).grid(row=4, column=0, rowspan=1, padx=10, pady=10)
+                     font=(self.fuente, self.tamanio_fuente)).grid(row=3, column=0, rowspan=1, padx=10, pady=10)
         self.entry_fecha_fin = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
-        self.entry_fecha_fin.grid(row=4, column=1, padx=10, pady=10)
+        self.entry_fecha_fin.grid(row=3, column=1, padx=10, pady=10)
 
         self.open_calendar_fecha_fin = ctk.CTkButton(frame, text="Seleccionar Fecha",
                                                      command=lambda: self.open_calendar("fecha_salida"))
-        self.open_calendar_fecha_fin.grid(row=5, column=1, padx=10, pady=10)
+        self.open_calendar_fecha_fin.grid(row=4, column=1, padx=10, pady=10)
 
         # Tabla para mostrar las habitaciones disponibles
         self.tabla_habitaciones = ttk.Treeview(frame, columns=("numero", "tipo", "estado", "precio_por_noche"),
@@ -146,6 +143,10 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
 
         # Llamar al servicio para obtener las habitaciones disponibles
         habitaciones_disponibles = self.habitacion_service.get_habitaciones_disponibles_by_date_range(fecha_inicio, fecha_fin)
+
+        if len(habitaciones_disponibles) == 0:
+            messagebox.showinfo("No hay habitaciones disponibles", "No se encontraron habitaciones disponibles entre las fechas solicitadas")
+
         print("Cantidad de habitaciones disponibles:", len(habitaciones_disponibles))
 
         # Limpiar la tabla antes de insertar los nuevos resultados

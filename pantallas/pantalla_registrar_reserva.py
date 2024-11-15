@@ -210,9 +210,11 @@ class RegistrarReserva(ctk.CTkToplevel):
     def limpiar_campos(self):
         self.combo_cliente.set("Seleccione un cliente")
         self.combo_habitacion.set("Seleccione una habitación")
-        self.entry_fecha_entrada.insert(0, "")
+        self.entry_fecha_entrada.delete(0, "end")
+        nueva_fecha = self.fecha_actual()
+        self.entry_fecha_entrada.insert(0, nueva_fecha)
         self.entry_fecha_salida.delete(0, "end")
-        self.entry_cantidad_personas.insert(0, "")
+        self.entry_cantidad_personas.delete(0, "end")
         self.actualizar_tabla()
 
     def actualizar_tabla(self):

@@ -18,7 +18,7 @@ class RegistrarHabitacion(ctk.CTkToplevel):
         self.geometry("1100x800")  # Ajustar el tamaño
         self.minsize(1100, 800)
 
-        self.tamaño_fuente = 14
+        self.tamanio_fuente = 14
         self.fuente = "Arial"
         self.width = 250
 
@@ -38,31 +38,31 @@ class RegistrarHabitacion(ctk.CTkToplevel):
 
         # Etiquetas y campos de entrada
         ctk.CTkLabel(frame, text="Número de Habitación:",
-                     font=(self.fuente, self.tamaño_fuente)
+                     font=(self.fuente, self.tamanio_fuente)
                      ).grid(row=1, column=0, padx=10, pady=10)
-        self.entry_numero = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamaño_fuente))
+        self.entry_numero = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.entry_numero.grid(row=1, column=1, padx=10, pady=10)
 
         ctk.CTkLabel(frame, text="Tipo de Habitación:",
-                     font=(self.fuente, self.tamaño_fuente)
+                     font=(self.fuente, self.tamanio_fuente)
                      ).grid(row=2, column=0, padx=10, pady=10)
         self.combo_tipo = ctk.CTkComboBox(frame, values=["Simple", "Doble", "Suite"]
-                                          , width=self.width, font=(self.fuente, self.tamaño_fuente))
+                                          , width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.combo_tipo.grid(row=2, column=1, padx=10, pady=10)
         self.combo_tipo.set("Seleccione un tipo")
 
         ctk.CTkLabel(frame, text="Estado:",
-                     font=(self.fuente, self.tamaño_fuente)
+                     font=(self.fuente, self.tamanio_fuente)
                      ).grid(row=3, column=0, padx=10, pady=10)
         self.combo_estado = ctk.CTkComboBox(frame, values=["Disponible", "Ocupada"],
-                                            width=self.width, font=(self.fuente, self.tamaño_fuente))
+                                            width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.combo_estado.grid(row=3, column=1, padx=10, pady=10)
         self.combo_estado.set("Seleccione un estado")
 
         ctk.CTkLabel(frame, text="Precio por Noche:",
-                     font=(self.fuente, self.tamaño_fuente)
+                     font=(self.fuente, self.tamanio_fuente)
                      ).grid(row=4, column=0, padx=10, pady=10)
-        self.entry_precio = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamaño_fuente))
+        self.entry_precio = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.entry_precio.grid(row=4, column=1, padx=10, pady=10)
 
         # Tabla para mostrar las habitaciones registradas
@@ -81,7 +81,7 @@ class RegistrarHabitacion(ctk.CTkToplevel):
 
         # Botón para registrar la habitación
         ctk.CTkButton(frame, text="Registrar Habitación", command=self.registrar_habitacion,
-                      font=(self.fuente, self.tamaño_fuente)
+                      font=(self.fuente, self.tamanio_fuente)
                       ).grid(row=5, column=0, columnspan=2, pady=10)
 
         # Centrar ventana después de ajustarse al contenido

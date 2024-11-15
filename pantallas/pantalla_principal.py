@@ -1,21 +1,12 @@
 import customtkinter as ctk
 
+from pantallas.pantalla_asignar_empleado import AsignarEmpleadoXHabitacion
 from pantallas.pantalla_buscar_reservas import BuscarReservas
-from pantallas.pantalla_cliente import RegistrarCliente
+from pantallas.pantalla_registrar_cliente import RegistrarCliente
 from pantallas.pantalla_consultar_disponibilidad import ConsultarDisponibilidad
 from pantallas.pantalla_habitacion import RegistrarHabitacion
-from pantallas.pantalla_reserva import RegistrarReserva
+from pantallas.pantalla_registrar_reserva import RegistrarReserva
 
-# from views.consultar_autos_vendidos import ConsultarAutosVendidos
-# from views.consultar_servicios_realizados import ConsultarServiciosRealizados
-# from views.registrar_auto import RegistrarAuto
-# from views.helpers.window_size_helper import WindowSizeHelper
-# from views.registrar_cliente import RegistrarCliente
-# from views.registrar_vendedor import RegistrarVendedor
-# from views.registrar_venta import RegistrarVenta
-# from views.registrar_servicio import RegistrarServicio
-# from views.generar_reportes import GenerarReportes
-# from views.gestion_inventario import GestionInventario
 from pantallas.helpers.window_size_helper import WindowSizeHelper
 
 
@@ -25,6 +16,10 @@ class PantallaPrincipal(ctk.CTk):
 
         self.db = db
         self.title("Menú Principal - Sistema de Gestión de Hotel")
+
+        # Pantalla programando actualmente
+        asignar_empleado_x_habitacion = AsignarEmpleadoXHabitacion(db)
+        asignar_empleado_x_habitacion.grab_set()
 
         # Configuración de tema oscuro
         ctk.set_appearance_mode("dark")
@@ -41,6 +36,7 @@ class PantallaPrincipal(ctk.CTk):
         button_frame = ctk.CTkFrame(self)
         button_frame.pack(pady=30, padx=30)
 
+
         # Botones del menú
         botones = [
             ("Registrar Habitación", self.abrir_registrar_habitacion),
@@ -48,12 +44,9 @@ class PantallaPrincipal(ctk.CTk):
             ("Registrar Reserva", self.abrir_registrar_reserva),
             ("Buscar Reservas", self.abrir_buscar_reservas),
             ("Registrar Factura", self.abrir_registrar_factura),
-            ("Asignar Empleados a habitación", self.abrir_registrar_servicio),
+            ("Asignar Empleados a habitación", self.abrir_asignar_empleado),
             ("Consultar Disponibilidad de habitaciones", self.abrir_consultar_disponibilidad_habitaciones),
-            ("Consultar Servicios", self.consultar_servicios),
-            ("Consultar Servicios", self.consultar_servicios),
             ("Generar Reportes", self.generar_reportes),
-            ("Gestión de Inventario", self.abrir_gestion_inventario),
             ("Salir", self.quit)
         ]
 
@@ -87,20 +80,15 @@ class PantallaPrincipal(ctk.CTk):
     def abrir_registrar_factura(self):
         pass
 
-    def abrir_registrar_servicio(self):
-        pass
+    def abrir_asignar_empleado(self):
+        asignar_empleado_x_habitacion = AsignarEmpleadoXHabitacion(self.db)
+        asignar_empleado_x_habitacion.grab_set()
         
     def abrir_consultar_disponibilidad_habitaciones(self):
         consultar_disponibilidad = ConsultarDisponibilidad(self.db)
         consultar_disponibilidad.grab_set()
-        
-    def consultar_servicios(self):
-        pass
 
     def generar_reportes(self):
-        pass
-
-    def abrir_gestion_inventario(self):
         pass
 
     def quit(self):
