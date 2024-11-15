@@ -8,6 +8,7 @@ from pantallas.pantalla_habitacion import RegistrarHabitacion
 from pantallas.pantalla_registrar_reserva import RegistrarReserva
 
 from pantallas.helpers.window_size_helper import WindowSizeHelper
+from pantallas.pantalla_reportes import PantallaReportes
 
 
 class PantallaPrincipal(ctk.CTk):
@@ -18,8 +19,8 @@ class PantallaPrincipal(ctk.CTk):
         self.title("Menú Principal - Sistema de Gestión de Hotel")
 
         # Pantalla programando actualmente
-        asignar_empleado_x_habitacion = AsignarEmpleadoXHabitacion(db)
-        asignar_empleado_x_habitacion.grab_set()
+        # asignar_empleado_x_habitacion = AsignarEmpleadoXHabitacion(db)
+        # asignar_empleado_x_habitacion.grab_set()
 
         # Configuración de tema oscuro
         ctk.set_appearance_mode("dark")
@@ -42,7 +43,6 @@ class PantallaPrincipal(ctk.CTk):
             ("Registrar Habitación", self.abrir_registrar_habitacion),
             ("Registrar Cliente", self.abrir_registrar_cliente),
             ("Registrar Reserva", self.abrir_registrar_reserva),
-            ("Buscar Reservas", self.abrir_buscar_reservas),
             ("Registrar Factura", self.abrir_registrar_factura),
             ("Asignar Empleados a habitación", self.abrir_asignar_empleado),
             ("Consultar Disponibilidad de habitaciones", self.abrir_consultar_disponibilidad_habitaciones),
@@ -73,9 +73,6 @@ class PantallaPrincipal(ctk.CTk):
         registrar_reserva = RegistrarReserva(self.db)
         registrar_reserva.grab_set()
 
-    def abrir_buscar_reservas(self):
-        buscar_reservas = BuscarReservas(self.db)
-        buscar_reservas.grab_set()
 
     def abrir_registrar_factura(self):
         pass
@@ -89,7 +86,9 @@ class PantallaPrincipal(ctk.CTk):
         consultar_disponibilidad.grab_set()
 
     def generar_reportes(self):
-        pass
+        generar_reportes = PantallaReportes(self.db)
+        generar_reportes.grab_set()
+        # generar_reportes.mainloop()
 
     def quit(self):
         self.db.close_db()
