@@ -5,16 +5,15 @@ from tkinter.font import Font
 class ReportesWindow(tk.Toplevel):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.title("Ventana de Reportes")
+        self.title("Reportes")
         self.geometry("800x600")
-        self.resizable(False, False)  # Evitar redimensionar la ventana
-        self.configure(bg="#332f2C")  # Fondo oscuro
+        self.resizable(False, False)  
+        self.configure(bg="#332f2C")  
         self.iconbitmap("C:\\Users\\admin\\Downloads\\Unv\\recursos\\UTN_logo.ico")
 
-        # Centrar la ventana
+        
         self.center_window(800, 600)
 
-        # Título de la ventana
         title_font = Font(family="Sans-serif", size=14, weight="bold")
         title_label = tk.Label(
             self, 
@@ -26,18 +25,15 @@ class ReportesWindow(tk.Toplevel):
         )
         title_label.pack(fill=tk.X, pady=(20, 10))
 
-        # Contenedor principal para los botones
         button_frame = tk.Frame(self, bg="#332f2C")
         button_frame.pack(expand=True)
 
-        # Información de los botones
         buttons_info = [
             "Reservas Realizadas en un periodo de tiempo",
             "Reporte ingresos por habitaciones y servicios extras",
             "Reporte de ocupación promedio por tipo de habitación"
         ]
 
-        # Configuración de botones
         button_font = Font(family="Sans-serif", size=10)
         for text in buttons_info:
             button = tk.Button(
@@ -53,7 +49,7 @@ class ReportesWindow(tk.Toplevel):
                 relief="flat",
                 command=lambda t=text: self.button_clicked(t)
             )
-            button.pack(pady=10)  # Espaciado entre botones
+            button.pack(pady=10)  
 
     def button_clicked(self, text):
         print(f"Botón '{text}' presionado")
@@ -69,6 +65,6 @@ class ReportesWindow(tk.Toplevel):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.withdraw()  # Ocultar la ventana principal (para pruebas de Toplevel)
+    root.withdraw() 
     window = ReportesWindow()
     window.mainloop()

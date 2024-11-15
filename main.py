@@ -23,7 +23,6 @@ class MainWindow(tk.Tk):
         
   
 
-        # Configuración de botones
         buttons_info = [
             ("Registrar \nHabitaciones", "C:\\Users\\admin\\Downloads\\Unv\\tp-dao\\recursos\\habitacion.png"),
             ("Registrar \nClientes", "C:\\Users\\admin\\Downloads\\Unv\\recursos\\personas.png"),
@@ -33,12 +32,11 @@ class MainWindow(tk.Tk):
             ("Disponibilidad\nHabitaciones", "C:\\Users\\admin\\Downloads\\Unv\\recursos\\firmar.png"),
         ]
 
-        grid_frame = tk.Frame(self, bg="#18171c")  # Sin fondo
+        grid_frame = tk.Frame(self, bg="#18171c")  
         grid_frame.pack(expand=True, pady=10)
 
         row, col = 0, 0
         for name, icon_path in buttons_info:
-            # Icono del botón
             icon_image = Image.open(icon_path).resize((40, 40), Image.LANCZOS)
             icon_photo = ImageTk.PhotoImage(icon_image)
 
@@ -48,16 +46,16 @@ class MainWindow(tk.Tk):
                 image=icon_photo,
                 compound="top",
                 font=Font(family="Sans-serif", size=11),
-                bg="#282828",  # Fondo oscuro del botón
-                fg="white",  # Texto en blanco
-                activebackground="#444444",  # Color de fondo al presionar
-                activeforeground="white",  # Color del texto al presionar
-                bd=0,  # Sin borde
+                bg="#282828", 
+                activebackground="#444444", 
+                activeforeground="white", 
+                fg="white",
+                bd=0,  
                 width=170,
                 height=150,
                 command=lambda n=name: self.button_clicked(n)
             )
-            button.image = icon_photo  # Mantener referencia para evitar que se elimine
+            button.image = icon_photo  
             button.grid(row=row, column=col, padx=10, pady=10)
 
             col += 1
@@ -65,7 +63,6 @@ class MainWindow(tk.Tk):
                 col = 0
                 row += 1
 
-        # Botón de Reportes centrado
         report_icon = Image.open("C:\\Users\\admin\\Downloads\\Unv\\tp-dao\\recursos\\dinero.png").resize((40, 40), Image.LANCZOS)
         report_photo = ImageTk.PhotoImage(report_icon)
 
@@ -75,17 +72,17 @@ class MainWindow(tk.Tk):
             image=report_photo,
             compound="top",
             font=Font(family="Sans-serif", size=11),
-            bg="#282828",  # Fondo oscuro del botón
-            fg="white",  # Texto en blanco
-            activebackground="#444444",  # Color de fondo al presionar
-            activeforeground="white",  # Color del texto al presionar
-            bd=0,  # Sin borde
+            bg="#282828",  
+            fg="white", 
+            activebackground="#444444", 
+            activeforeground="white",  
+            bd=0,  
             width=170,
             height=150,
             command=self.open_reportes_window
         )
         reportes_button.image = report_photo
-        reportes_button.grid(row=row + 1, column=1, columnspan=1, pady=20)  # Centrar en la última fila
+        reportes_button.grid(row=row + 1, column=1, columnspan=1, pady=20)  
 
     def button_clicked(self, name):
         print(f"Botón '{name}' presionado")
