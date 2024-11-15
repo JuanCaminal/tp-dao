@@ -189,6 +189,8 @@ class RegistrarReserva(ctk.CTkToplevel):
                 messagebox.showerror("Error", "Lo sentimos ocurrio un error de base de datos")
                 return
 
+        fecha_entrada = datetime.strptime(fecha_entrada, "%d/%m/%Y").strftime("%Y-%m-%d")
+        fecha_salida = datetime.strptime(fecha_salida, "%d/%m/%Y").strftime("%Y-%m-%d")
 
         reserva_data = {
             "cliente": cliente_id,

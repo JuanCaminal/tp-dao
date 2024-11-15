@@ -121,13 +121,19 @@ class BuscarReservas(ctk.CTkToplevel):
         return datetime.now().strftime("%d/%m/%Y")
 
     def limpiar_campos(self):
-        self.entry_fecha_inicio.insert(0, "")
-        self.entry_fecha_fin.delete(0, "end")
+        # self.entry_fecha_inicio.insert(0, "")
+        # self.entry_fecha_fin.delete(0, "end")
         # self.actualizar_tabla()
+        pass
 
     def buscar_reservas(self):
         fecha_inicio = self.entry_fecha_inicio.get()
         fecha_fin = self.entry_fecha_fin.get()
+
+        # Convertir las fechas a formato yyyy-mm-dd
+        fecha_inicio = datetime.strptime(fecha_inicio, '%d/%m/%Y').strftime('%Y-%m-%d')
+        fecha_fin = datetime.strptime(fecha_fin, '%d/%m/%Y').strftime('%Y-%m-%d')
+
         if fecha_inicio == "" or fecha_fin == "":
             messagebox.showerror("Error", "Debe ingresar una fecha.")
             return

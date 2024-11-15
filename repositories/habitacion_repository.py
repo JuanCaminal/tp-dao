@@ -44,18 +44,22 @@ class HabitacionRepository:
         self.db.commit()
         return cursor.rowcount
 
-    def get_diponibles_by_date_range(self, fecha_inicio, fecha_fin):
+    def get_diponibles_by_date_range(self, fecha_entrada, fecha_salida):
         cursor = self.db.cursor()
         query = """
-                SELECT numero, tipo, estado, precio_por_noche
-                FROM habitaciones
-                WHERE numero NOT IN (
-                    SELECT habitacion_numero
-                    FROM reservas
-                    WHERE (fecha_entrada < ? AND fecha_salida > ?)
+            SELECT numero, tipo, estado, precio_por_noche
+            FROM habitaciones
+            WHERE numero NOT IN (
+                SELECT habitacion_numero
+                FROM reservas
+                WHERE (
+                    (fecha_entrada <= ? AND fecha_salida >= ?) OR
+                    (fecha_entrada <= ? AND fecha_salida >= ?) OR
+                    (fecha_entrada >= ? AND fecha_salida <= ?)
                 )
-            """
-        cursor.execute(query, (fecha_fin, fecha_inicio))
+            );
+        """
+        cursor.execute(query, (fecha_salida, fecha_entrada, fecha_salida, fecha_entrada, fecha_entrada, fecha_salida))
         habitaciones_data = cursor.fetchall()
 
         # Transformar los resultados en objetos Habitacion

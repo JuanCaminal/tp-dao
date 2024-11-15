@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from clases.habitacion import Habitacion
 from repositories.habitacion_repository import HabitacionRepository
 
@@ -27,4 +29,12 @@ class HabitacionService:
         return self.habitacion_repository.delete(numero)
 
     def get_habitaciones_disponibles_by_date_range(self, fecha_inicio, fecha_fin):
-        return self.habitacion_repository.get_diponibles_by_date_range(fecha_inicio, fecha_fin)
+        # Convertir las fechas a formato yyyy-mm-dd
+        fecha_entrada = self.convertir_fecha_dd_mm_aaaa_a_yyyy_mm_dd(fecha_inicio.strftime("%d/%m/%Y"))
+        fecha_salida = self.convertir_fecha_dd_mm_aaaa_a_yyyy_mm_dd(fecha_fin.strftime("%d/%m/%Y"))
+
+        return self.habitacion_repository.get_diponibles_by_date_range(fecha_entrada, fecha_salida)
+
+    @staticmethod
+    def convertir_fecha_dd_mm_aaaa_a_yyyy_mm_dd(fecha):
+        return datetime.strptime(fecha, '%d/%m/%Y').strftime('%Y-%m-%d')

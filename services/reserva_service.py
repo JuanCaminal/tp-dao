@@ -1,9 +1,12 @@
 from clases.reserva import Reserva
 from repositories.reserva_repository import ReservaRepository
+from services.habitacion_service import HabitacionService
+
 
 class ReservaService:
     def __init__(self, db):
         self.reserva_repository = ReservaRepository(db)
+        self.habitacion_service = HabitacionService(db)
 
     def get_all(self):
         return self.reserva_repository.get_all()

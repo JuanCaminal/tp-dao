@@ -29,7 +29,7 @@ class ReservaRepository:
         query = """
             SELECT id_reserva, cliente_id, habitacion_numero, fecha_entrada, fecha_salida, cantidad_personas 
             FROM reservas 
-            WHERE fecha_salida >= ? AND fecha_entrada<= ?
+            WHERE fecha_entrada >= ? AND fecha_salida <= ?
         """
         cursor.execute(query, (fecha_inicio, fecha_fin))
         reservas_data = cursor.fetchall()
@@ -58,14 +58,16 @@ class ReservaRepository:
         return cursor.lastrowid
 
     def update(self, id, reserva):
-        cursor = self.db.cursor()
+        conn = self.db.get_db()
+        cursor = conn.cursor()
         cursor.execute('UPDATE reservas SET cliente_id = ?, habitacion_numero = ?, fecha_entrada = ?, fecha_salida = ?, cantidad_personas = ? WHERE id_reserva = ?',
                        (reserva.cliente, reserva.habitacion, reserva.fecha_entrada, reserva.fecha_salida, reserva.cantidad_personas, id))
         self.db.commit()
         return cursor.rowcount
 
     def delete(self, id):
-        cursor = self.db.cursor()
+        conn = self.db.get_db()
+        cursor = conn.cursor()
         cursor.execute('DELETE FROM reservas WHERE id_reserva = ?', (id,))
         self.db.commit()
         return cursor.rowcount

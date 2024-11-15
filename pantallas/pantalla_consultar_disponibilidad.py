@@ -125,41 +125,32 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
     def buscar_habitaciones_disponibles(self):
         fecha_inicio = self.entry_fecha_inicio.get()
         fecha_fin = self.entry_fecha_fin.get()
-        if fecha_inicio == "" or fecha_fin == "":
-            messagebox.showerror("Error", "Debe ingresar una fecha.")
-            return
-        elif fecha_inicio > fecha_fin:
-            messagebox.showerror("Error", "La fecha de inicio debe ser menor a la fecha de salida.")
+
+        # Validar que las fechas no estén vacías
+        if not fecha_inicio or not fecha_fin:
+            messagebox.showerror("Error", "Debe ingresar ambas fechas.")
             return
 
+        try:
+            # Convertir las fechas ingresadas a objetos datetime
+            fecha_inicio = datetime.strptime(fecha_inicio, "%d/%m/%Y")
+            fecha_fin = datetime.strptime(fecha_fin, "%d/%m/%Y")
+        except ValueError:
+            messagebox.showerror("Error", "El formato de la fecha debe ser dd/mm/yyyy.")
+            return
+
+        # Validar que la fecha de inicio sea menor o igual a la fecha de fin
+        if fecha_inicio > fecha_fin:
+            messagebox.showerror("Error", "La fecha de inicio debe ser menor o igual a la fecha de salida.")
+            return
+
+        # Llamar al servicio para obtener las habitaciones disponibles
         habitaciones_disponibles = self.habitacion_service.get_habitaciones_disponibles_by_date_range(fecha_inicio, fecha_fin)
+        print("Cantidad de habitaciones disponibles:", len(habitaciones_disponibles))
 
+        # Limpiar la tabla antes de insertar los nuevos resultados
+        self.tabla_habitaciones.delete(*self.tabla_habitaciones.get_children())
 
-    """
-    def consultar_disponibilidad(self):
-        # Obtener las fechas desde los widgets DateEntry
-        fecha_entrada = self.entry_fecha_entrada.get_date()
-        fecha_salida = self.entry_fecha_salida.get_date()
-
-        # Validar que la fecha de entrada sea anterior a la de salida
-        if fecha_entrada >= fecha_salida:
-            messagebox.showerror("Error", "La fecha de entrada debe ser anterior a la fecha de salida.")
-            return
-
-        # Consultar disponibilidad en el sistema de gestión de habitaciones
-        habitaciones_disponibles = self.sistema_gestion_habitaciones.consultar_disponibilidad(fecha_entrada, fecha_salida)
-
-        # Mostrar los resultados
-        self.resultado.config(state='normal')
-        self.resultado.delete(1.0, tk.END)
-
-        if habitaciones_disponibles:
-            for habitacion in habitaciones_disponibles:
-                self.resultado.insert(tk.END, f"{habitacion}\n")
-        else:
-            self.resultado.insert(tk.END, "No hay habitaciones disponibles para estas fechas.")
-
-        self.resultado.config(state='disabled')
-        """
-
-
+        # Insertar las habitaciones disponibles en la tabla
+        for habitacion in habitaciones_disponibles:
+            self.tabla_habitaciones.insert("", "end", values=(habitacion.numero, habitacion.tipo, habitacion.estado, habitacion.precio_por_noche))
