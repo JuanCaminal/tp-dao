@@ -106,10 +106,9 @@ class RegistrarHabitacion(ctk.CTkToplevel):
         try:
             habitacion_existente = None
             habitacion_existente = self.habitacion_service.get_by_id(numero)
-            print("1222")
 
             if habitacion_existente != None:
-                print("holaaaa")
+
                 self.modificar_habitacion(numero, tipo, estado, precio)
 
             else:
