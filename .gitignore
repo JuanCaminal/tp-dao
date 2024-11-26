@@ -4,6 +4,10 @@ __pycache__/
 __pycache__/
 *.pyc
 
-
+*.pdf
 *.log
 *.env
+*.db
+*.sqlite
+/.idea
+/.venv

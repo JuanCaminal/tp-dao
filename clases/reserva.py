@@ -1,7 +1,7 @@
 import datetime
 
 class Reserva:
-    def __init__(self, id_reserva, cliente, habitacion, fecha_entrada, fecha_salida, cantidad_personas):
+    def __init__(self, cliente, habitacion, fecha_entrada, fecha_salida, cantidad_personas, id_reserva=None):
         self._id_reserva = id_reserva
         self._cliente = cliente
         self._habitacion = habitacion
