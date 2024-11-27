@@ -1,76 +1,78 @@
-# facturacion.py
+import customtkinter as ctk
 
-import tkinter as tk
-from tkinter import ttk, messagebox
-from datetime import datetime
+from services.cliente_service import ClienteService
+from services.factura_service import FacturaService
+from services.habitacion_service import HabitacionService
+from services.reserva_service import ReservaService
 
-# Clase Factura
-class Factura:
-    def __init__(self, id_factura, cliente, reserva, fecha_emision, total):
-        self.id_factura = id_factura
-        self.cliente = cliente
-        self.reserva = reserva
-        self.fecha_emision = fecha_emision
-        self.total = total
+"""
+Unica pantalla que no se llego a completar
+"""
+class EmitirFactura(ctk.CTkToplevel):
+    def __init__(self, db):
+        super().__init__()
+        ctk.set_appearance_mode("dark")
+        ctk.set_default_color_theme("dark-blue")
 
-# Lista para almacenar las facturas
-facturas = []
+        self.db = db
+        self.title('Registrar Reserva')
 
-# Función para generar factura
-def generar_factura(cliente, reserva, fecha_salida):
-    total = calcular_total(reserva)  # Suponiendo que hay una función calcular_total definida
-    factura = Factura(f"F-{len(facturas) + 1}", cliente, reserva, datetime.now(), total)
-    facturas.append(factura)
+        # Tamaño y configuración de la ventana
+        self.geometry("1100x800")  # Ajustar el tamaño
+        self.minsize(1100, 800)
+        self.maxsize(1100,800)
 
-    # Mostrar información de la factura
-    mensaje = f"Factura ID: {factura.id_factura}\nCliente: {factura.cliente}\nTotal: ${factura.total:.2f}"
-    messagebox.showinfo("Factura Generada", mensaje)
+        self.tamanio_fuente = 14
+        self.fuente = "Arial"
+        self.width = 250
 
-# Función para calcular el total de la reserva
-def calcular_total(reserva, precio_habitacion=100):
-    dias = (reserva.fecha_salida - reserva.fecha_entrada).days
-    return precio_habitacion * dias
+        self.habitacion_service = HabitacionService(db)
+        self.factura_service = FacturaService(db)
+        self.cliente_service = ClienteService(db)
+        self.reserva_service = ReservaService(db)
 
-# Función para registrar factura
-def registrar_factura(cliente_var, reserva_var):
-    cliente = cliente_var.get()
-    reserva = reserva_var.get()
+        self.clientes = self.cliente_service.get_all()
+        self.reservas = self.reserva_service.get_all()
+        self.habitaciones = self.habitacion_service.get_all()
 
-    if not cliente or not reserva:
-        messagebox.showerror("Error", "Por favor, seleccione un cliente y una reserva.")
-        return
+        # Crear widgets con estilo y valores por defecto
+        self.crear_widgets()
 
-    fecha_salida = datetime.now()  # Ejemplo de uso de fecha actual como fecha de salida
-    generar_factura(cliente, reserva, fecha_salida)
+    def crear_widgets(self):
+        # Frame principal con padding adicional para una apariencia más espaciosa
+        frame = ctk.CTkFrame(self, corner_radius=10)
+        frame.pack(fill="both", expand=True, padx=30, pady=30)
 
-# Crear interfaz de facturación
-def crear_interfaz_facturacion():
-    root = tk.Tk()
-    root.title("Sistema de Facturación")
+        # Titulo
+        ctk.CTkLabel(frame, text='Emitir factura', font=("Arial", 18)).grid(row=0, column=0, columnspan=2, pady=20)
 
-    frame_facturacion = tk.Frame(root)
-    frame_facturacion.pack(padx=10, pady=10)
+        # Etiquetas y campos de entrada
 
-    tk.Label(frame_facturacion, text="Registro de Factura").grid(row=0, column=0, columnspan=2)
+        # Combo Clientes
+        ctk.CTkLabel(frame, text="Cliente:",
+                     font=(self.fuente, self.tamanio_fuente)
+                     ).grid(row=1, column=0, padx=10, pady=10)
+        self.combo_cliente = ctk.CTkComboBox(frame, values=[f"{cliente.id_cliente} - {cliente.nombre} {cliente.apellido}" for cliente in
+                                                            self.clientes]
+                                             , width=self.width, font=(self.fuente, self.tamanio_fuente))
+        self.combo_cliente.grid(row=1, column=1, padx=10, pady=10)
+        self.combo_cliente.set("Seleccione un cliente")
 
-    # Cliente
-    tk.Label(frame_facturacion, text="Cliente:").grid(row=1, column=0)
-    cliente_var = tk.StringVar()
-    entry_cliente = tk.Entry(frame_facturacion, textvariable=cliente_var)
-    entry_cliente.grid(row=1, column=1)
+        datos_cliente = self.combo_cliente.get()
 
-    # Reserva
-    tk.Label(frame_facturacion, text="Reserva:").grid(row=2, column=0)
-    reserva_var = tk.StringVar()
-    entry_reserva = tk.Entry(frame_facturacion, textvariable=reserva_var)
-    entry_reserva.grid(row=2, column=1)
+        if datos_cliente != "Seleccione un cliente":
+            datos_cliente = datos_cliente.split(" - ")
+            id_cliente = datos_cliente[0]
 
-    # Botón para registrar factura
-    btn_guardar_factura = tk.Button(frame_facturacion, text="Registrar Factura", command=lambda: registrar_factura(cliente_var, reserva_var))
-    btn_guardar_factura.grid(row=3, column=0, columnspan=2, pady=10)
 
-    root.mainloop()
+        # Combo Habitacion
+        ctk.CTkLabel(frame, text="Habitación:",
+                     font=(self.fuente, self.tamanio_fuente,)
+                     ).grid(row=2, column=0, padx=10, pady=10)
+        self.combo_habitacion = ctk.CTkComboBox(frame,
+                                                values=[f"{habitacion.numero} - {habitacion.tipo}" for habitacion in
+                                                        self.habitaciones]
+                                                , width=self.width, font=(self.fuente, self.tamanio_fuente))
+        self.combo_habitacion.grid(row=2, column=1, padx=10, pady=10)
+        self.combo_habitacion.set("Seleccione una habitación")
 
-# Ejecutar la interfaz de facturación
-if __name__ == "__main__":
-    crear_interfaz_facturacion()

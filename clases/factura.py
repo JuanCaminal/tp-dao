@@ -1,7 +1,7 @@
 import datetime
 
 class Factura:
-    def init(self, id_factura, cliente, reserva, fecha_emision):
+    def __init__(self, id_factura, cliente, reserva, fecha_emision):
         self._id_factura = id_factura
         self._cliente = cliente
         self._reserva = reserva
