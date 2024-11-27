@@ -30,17 +30,17 @@ class PantallaPrincipal(ctk.CTk):
         ctk.set_default_color_theme("dark-blue")
 
         # Configurar fondo utilizando CTkImage
-        background_image = ctk.CTkImage(
+        self.background_image = ctk.CTkImage(
             Image.open("recursos/foto_fondo.jpg"),
             size=(1800, 1000)
         )
-        bg_label = ctk.CTkLabel(self, image=background_image, text="")
-        bg_label.place(relwidth=1, relheight=1)
+        self.bg_label = ctk.CTkLabel(self, image=self.background_image, text="")
+        self.bg_label.place(relwidth=1, relheight=1)
 
         # Reemplazar título con imagen
         title_image = ctk.CTkImage(
             Image.open("recursos/foto_logo.jpg"),  # Reemplaza con la ruta correcta
-            size=(150, 150 )  # Ajusta el tamaño si es necesario
+            size=(150, 150)  # Ajusta el tamaño si es necesario
         )
         title_label = ctk.CTkLabel(self, image=title_image, text="")
         title_label.pack(pady=(30, 20))  # Espaciado superior/inferior
@@ -65,7 +65,8 @@ class PantallaPrincipal(ctk.CTk):
             ("Registrar Reserva", self.abrir_registrar_reserva, "white", "#3a3a3a"),
             ("Registrar Factura", self.abrir_registrar_factura, "white", "#3a3a3a"),
             ("Asignar Empleados a habitación", self.abrir_asignar_empleado, "white", "#3a3a3a"),
-            ("Consultar Disponibilidad de habitaciones", self.abrir_consultar_disponibilidad_habitaciones, "white", "#3a3a3a"),
+            ("Consultar Disponibilidad de habitaciones", self.abrir_consultar_disponibilidad_habitaciones, "white",
+             "#3a3a3a"),
             ("Generar Reportes", self.generar_reportes, "white", "#3a3a3a"),
             ("Salir", self.quit, "white", "#8B0000"),  # Rojo para el botón de salir
         ]
@@ -82,16 +83,16 @@ class PantallaPrincipal(ctk.CTk):
             boton.pack(pady=15)  # Espaciado entre botones
 
         # Ajustar automáticamente la imagen de fondo al tamaño de la ventana
-        self.bind("<Configure>", lambda e: self.adjust_background(background_image))
+        self.bind("<Configure>", self.adjust_background)
 
         # Centrar la ventana
         self.after(10, lambda: WindowSizeHelper.centrar_ventana(self))
 
-    def adjust_background(self, bg_image):
+    def adjust_background(self, event=None):
         """Reajustar la imagen de fondo según el tamaño de la ventana."""
         width = self.winfo_width()
         height = self.winfo_height()
-        bg_image.configure(size=(width, height))
+        self.background_image.configure(size=(width, height))
 
     # Métodos para abrir las otras pantallas
     def abrir_registrar_habitacion(self):
@@ -99,11 +100,11 @@ class PantallaPrincipal(ctk.CTk):
         registrar_habitacion.grab_set()
 
     def abrir_registrar_cliente(self):
-        registrar_cliente = RegistrarCliente(self.db, self)  # Agrega "self" como pantalla_principal
+        registrar_cliente = RegistrarCliente(self.db, self)
         registrar_cliente.grab_set()
 
     def abrir_registrar_reserva(self):
-        registrar_reserva = RegistrarReserva(self.db)
+        registrar_reserva = RegistrarReserva(self.db, self)
         registrar_reserva.grab_set()
 
     def abrir_registrar_factura(self):
@@ -123,6 +124,6 @@ class PantallaPrincipal(ctk.CTk):
         generar_reportes.grab_set()
 
     def quit(self):
+        """Cierra la base de datos y la aplicación."""
         self.db.close_db()
         super().quit()
-

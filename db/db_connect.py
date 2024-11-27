@@ -37,7 +37,8 @@ class DBConnect:
                 apellido TEXT NOT NULL,
                 direccion TEXT,
                 telefono TEXT,
-                email TEXT
+                email TEXT,
+                puntos_fidelizacion INTEGER DEFAULT 0
             )
         """)
 

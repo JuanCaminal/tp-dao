@@ -67,7 +67,7 @@ class RegistrarCliente(ctk.CTkToplevel):
             if label_text == "Nro. Documento":
                 self.campos[label_text] = ctk.CTkEntry(
                     row_frame, font=("Arial", 14), width=250,
-                    validate="key", validatecommand=(vcmd_dni, "%P", 9)
+                    validate="key", validatecommand=(vcmd_dni, "%P", 8)
                 )
             else:
                 self.campos[label_text] = ctk.CTkEntry(
@@ -91,7 +91,7 @@ class RegistrarCliente(ctk.CTkToplevel):
         # Tabla para mostrar clientes registrados
         self.tabla_clientes = ttk.Treeview(
             frame,
-            columns=("id_cliente", "nombre", "apellido", "direccion", "telefono", "email", "nro_documento"),
+            columns=("id_cliente", "nombre", "apellido", "direccion", "telefono", "email", "nro_documento", "puntos"),
             show="headings"
         )
         self.tabla_clientes.heading("id_cliente", text="ID Cliente")
@@ -101,6 +101,7 @@ class RegistrarCliente(ctk.CTkToplevel):
         self.tabla_clientes.heading("telefono", text="Teléfono")
         self.tabla_clientes.heading("email", text="Email")
         self.tabla_clientes.heading("nro_documento", text="Nro. Documento")
+        self.tabla_clientes.heading("puntos", text="Puntos")
         self.tabla_clientes.pack(pady=10, fill="x", expand=True)
 
         # Ajustar tamaño de columnas
@@ -176,7 +177,7 @@ class RegistrarCliente(ctk.CTkToplevel):
         # Insertar los datos en la tabla
         for cliente in clientes:
             self.tabla_clientes.insert("", "end", values=(cliente.id_cliente, cliente.nombre, cliente.apellido,
-                                                          cliente.direccion, cliente.telefono, cliente.email, cliente.nro_documento))
+                                                          cliente.direccion, cliente.telefono, cliente.email, cliente.nro_documento, cliente.puntos_fidelizacion))
 
     def volver_a_pantalla_principal(self):
         """Cierra la pantalla actual y regresa a la principal."""
