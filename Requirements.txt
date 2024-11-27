@@ -3,3 +3,4 @@ customtkinter==5.2.2
 matplotlib==3.9.2
 Tkcalendar==1.6.1
 reportlab==4.2.5
+pillow~=11.0.0
