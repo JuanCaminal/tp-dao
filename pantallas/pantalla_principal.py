@@ -1,7 +1,8 @@
 import customtkinter as ctk
+from PIL import Image
 
 from pantallas.pantalla_asignar_empleado import AsignarEmpleadoXHabitacion
-from pantallas.pantalla_buscar_reservas import BuscarReservas
+from pantallas.pantalla_buscar_reservasAAAAAAAAAAAAAAAAAAAa import BuscarReservas
 from pantallas.pantalla_factura import EmitirFactura
 from pantallas.pantalla_registrar_cliente import RegistrarCliente
 from pantallas.pantalla_consultar_disponibilidad import ConsultarDisponibilidad
@@ -19,51 +20,78 @@ class PantallaPrincipal(ctk.CTk):
         self.db = db
         self.title("Menú Principal - Sistema de Gestión de Hotel")
 
-        # Pantalla programando actualmente
-        # registrar_factura = EmitirFactura(self.db)
-        # registrar_factura.grab_set()
-
-        WindowSizeHelper.set_size(self, 1150, 800)  # Definir el tamaño inicial
-        self.minsize(650, 800)
-        self.maxsize(650, 800)
+        # Configurar ventana inicial con resolución fija
+        self.geometry("1800x1000")
+        self.minsize(1800, 1000)
+        self.resizable(True, True)
 
         # Configuración de tema oscuro
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
 
-        # Remover el tamaño fijo, permitiendo que se ajuste al contenido
-        self.resizable(True, True)
+        # Configurar fondo utilizando CTkImage
+        background_image = ctk.CTkImage(
+            Image.open("recursos/foto_fondo.jpg"),
+            size=(1800, 1000)
+        )
+        bg_label = ctk.CTkLabel(self, image=background_image, text="")
+        bg_label.place(relwidth=1, relheight=1)
+
+        # Reemplazar título con imagen
+        title_image = ctk.CTkImage(
+            Image.open("recursos/foto_logo.jpg"),  # Reemplaza con la ruta correcta
+            size=(150, 150 )  # Ajusta el tamaño si es necesario
+        )
+        title_label = ctk.CTkLabel(self, image=title_image, text="")
+        title_label.pack(pady=(30, 20))  # Espaciado superior/inferior
 
         # Etiqueta de bienvenida
-        label = ctk.CTkLabel(self, text=" -  Bienvenido al Sistema de Gestión de Hotel  - ", font=ctk.CTkFont(size=18, weight="bold"))
-        label.pack(pady=(30, 20))  # Añadir espacio superior para centrar mejor
+        label = ctk.CTkLabel(
+            self, text=" Bienvenido al Sistema de Gestión de Hotel Royal ",
+            font=ctk.CTkFont(size=22, weight="bold"),
+            text_color="white",
+            fg_color="transparent"  # Sin fondo
+        )
+        label.pack(pady=(30, 20))
 
-        # Crear un frame para organizar los botones con mayor separación
-        button_frame = ctk.CTkFrame(self)
-        button_frame.pack(pady=30, padx=30)
-
+        # Frame transparente para botones
+        button_frame = ctk.CTkFrame(self, fg_color="transparent")
+        button_frame.pack(pady=30, padx=30, fill="none", expand=True)
 
         # Botones del menú
         botones = [
-            ("Registrar Habitación", self.abrir_registrar_habitacion),
-            ("Registrar Cliente", self.abrir_registrar_cliente),
-            ("Registrar Reserva", self.abrir_registrar_reserva),
-            ("Registrar Factura", self.abrir_registrar_factura),
-            ("Asignar Empleados a habitación", self.abrir_asignar_empleado),
-            ("Consultar Disponibilidad de habitaciones", self.abrir_consultar_disponibilidad_habitaciones),
-            ("Generar Reportes", self.generar_reportes),
-            ("Salir", self.quit)
+            ("Registrar Habitación", self.abrir_registrar_habitacion, "white", "#3a3a3a"),
+            ("Registrar Cliente", self.abrir_registrar_cliente, "white", "#3a3a3a"),
+            ("Registrar Reserva", self.abrir_registrar_reserva, "white", "#3a3a3a"),
+            ("Registrar Factura", self.abrir_registrar_factura, "white", "#3a3a3a"),
+            ("Asignar Empleados a habitación", self.abrir_asignar_empleado, "white", "#3a3a3a"),
+            ("Consultar Disponibilidad de habitaciones", self.abrir_consultar_disponibilidad_habitaciones, "white", "#3a3a3a"),
+            ("Generar Reportes", self.generar_reportes, "white", "#3a3a3a"),
+            ("Salir", self.quit, "white", "#8B0000"),  # Rojo para el botón de salir
         ]
 
-        for texto, comando in botones:
-            boton = ctk.CTkButton(button_frame, text=texto, command=comando, width=300, height=40, font=ctk.CTkFont(size=16))
-            boton.pack(pady=10)  # Separación entre botones
+        for texto, comando, text_color, hover_color in botones:
+            boton = ctk.CTkButton(
+                button_frame, text=texto, command=comando,
+                font=ctk.CTkFont(size=16),
+                fg_color="transparent",  # Sin fondo
+                text_color=text_color,
+                hover_color=hover_color,
+                corner_radius=10, height=50, width=400
+            )
+            boton.pack(pady=15)  # Espaciado entre botones
 
-        # Actualizar la ventana para que se ajuste al contenido
-        self.update_idletasks()
+        # Ajustar automáticamente la imagen de fondo al tamaño de la ventana
+        self.bind("<Configure>", lambda e: self.adjust_background(background_image))
 
-        # Centrar la ventana después del renderizado completo
+        # Centrar la ventana
         self.after(10, lambda: WindowSizeHelper.centrar_ventana(self))
+
+    def adjust_background(self, bg_image):
+        """Reajustar la imagen de fondo según el tamaño de la ventana."""
+        width = self.winfo_width()
+        height = self.winfo_height()
+        bg_image.configure(size=(width, height))
 
     # Métodos para abrir las otras pantallas
     def abrir_registrar_habitacion(self):
@@ -71,13 +99,12 @@ class PantallaPrincipal(ctk.CTk):
         registrar_habitacion.grab_set()
 
     def abrir_registrar_cliente(self):
-        registrar_cliente = RegistrarCliente(self.db)
+        registrar_cliente = RegistrarCliente(self.db, self)  # Agrega "self" como pantalla_principal
         registrar_cliente.grab_set()
 
     def abrir_registrar_reserva(self):
         registrar_reserva = RegistrarReserva(self.db)
         registrar_reserva.grab_set()
-
 
     def abrir_registrar_factura(self):
         registrar_factura = EmitirFactura(self.db)
@@ -94,8 +121,8 @@ class PantallaPrincipal(ctk.CTk):
     def generar_reportes(self):
         generar_reportes = PantallaReportes(self.db)
         generar_reportes.grab_set()
-        # generar_reportes.mainloop()
 
     def quit(self):
         self.db.close_db()
         super().quit()
+

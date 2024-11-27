@@ -57,7 +57,7 @@ class AsignarEmpleadoXHabitacion(ctk.CTkToplevel):
         self.combo_empleado = ctk.CTkComboBox(frame,
                                                 values=[f"{empleado.apellido}, {empleado.nombre}" for empleado in
                                                         self.empleados]
-                                                , width=self.width, font=(self.fuente, self.tamanio_fuente), state='readonly')
+                                                , width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.combo_empleado.grid(row=1, column=1, padx=10, pady=10)
         self.combo_empleado.set("Seleccione un empleado")
 
@@ -68,7 +68,7 @@ class AsignarEmpleadoXHabitacion(ctk.CTkToplevel):
         self.combo_habitacion = ctk.CTkComboBox(frame,
                                                 values=[f"{habitacion.numero} - {habitacion.tipo}" for habitacion in
                                                         self.habitaciones]
-                                                , width=self.width, font=(self.fuente, self.tamanio_fuente), state='readonly')
+                                                , width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.combo_habitacion.grid(row=2, column=1, padx=10, pady=10)
         self.combo_habitacion.set("Seleccione una habitación")
 

@@ -2,7 +2,7 @@ import customtkinter as ctk
 from tkinter import messagebox
 
 from pantallas.pantalla_asignar_empleado import AsignarEmpleadoXHabitacion
-from pantallas.pantalla_buscar_reservas import BuscarReservas
+from pantallas.pantalla_buscar_reservasAAAAAAAAAAAAAAAAAAAa import BuscarReservas
 from pantallas.pantalla_registrar_cliente import RegistrarCliente
 from pantallas.pantalla_consultar_disponibilidad import ConsultarDisponibilidad
 from pantallas.pantalla_habitacion import RegistrarHabitacion

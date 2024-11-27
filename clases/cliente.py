@@ -1,11 +1,12 @@
 class Cliente:
-    def __init__(self, nombre, apellido, direccion, telefono, email, id_cliente=None):
+    def __init__(self, nombre, apellido, direccion, telefono, email, nro_documento, id_cliente=None):
         self._id_cliente = id_cliente
         self._nombre = nombre
         self._apellido = apellido
         self._direccion = direccion
         self._telefono = telefono
         self._email = email
+        self._nro_documento = nro_documento
 
     def str(self):
         return f'Cliente {self.nombre} {self.apellido} - ID: {self.id_cliente}'
@@ -22,7 +23,7 @@ class Cliente:
     @property
     def nombre(self):
         return self._nombre
-    
+
     @nombre.setter
     def nombre(self, nombre):
         self._nombre = nombre
@@ -42,7 +43,7 @@ class Cliente:
     @direccion.setter
     def direccion(self, direccion):
         self._direccion = direccion
-        
+
     @property
     def telefono(self):
         return self._telefono
@@ -58,3 +59,11 @@ class Cliente:
     @email.setter
     def email(self, email):
         self._email = email
+
+    @property
+    def nro_documento(self):
+        return self._nro_documento
+
+    @nro_documento.setter
+    def nro_documento(self, nro_documento):
+        self._nro_documento = nro_documento

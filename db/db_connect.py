@@ -22,13 +22,17 @@ class DBConnect:
     def close_db(self):
         self.db.close()
 
+    def commit(self):
+        """Método para hacer commit a la base de datos."""
+        self.db.commit()  # Asegúrate de llamar al commit sobre la conexión a la base de datos.
+
     def crear_tablas(self):
         cursor = self.db.cursor()
-        
-        # Tabla de clientes
+
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS clientes (
                 id_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
+                nro_documento TEXT UNIQUE NOT NULL,
                 nombre TEXT NOT NULL,
                 apellido TEXT NOT NULL,
                 direccion TEXT,
@@ -36,7 +40,7 @@ class DBConnect:
                 email TEXT
             )
         """)
-        
+
         # Tabla de empleados
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS empleados (
@@ -47,7 +51,7 @@ class DBConnect:
                 sueldo REAL
             )
         """)
-        
+
         # Tabla de habitaciones
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS habitaciones (
@@ -57,7 +61,7 @@ class DBConnect:
                 precio_por_noche REAL
             )
         """)
-        
+
         # Tabla de reservas
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS reservas (
@@ -71,7 +75,7 @@ class DBConnect:
                 FOREIGN KEY(habitacion_numero) REFERENCES habitaciones(numero)
             )
         """)
-        
+
         # Tabla de facturas
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS factura (
@@ -84,7 +88,7 @@ class DBConnect:
                 FOREIGN KEY(reserva_id) REFERENCES reservas(id_reserva)
             )
         """)
-        
+
         # Nueva tabla para asignar empleados a habitaciones
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS empleados_habitaciones (
@@ -97,6 +101,6 @@ class DBConnect:
                 FOREIGN KEY(habitacion_numero) REFERENCES habitaciones(numero)
             )
         """)
-        
+
         # Confirmar los cambios
         self.db.commit()

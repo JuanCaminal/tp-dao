@@ -3,6 +3,7 @@ import customtkinter as ctk
 from tkinter import ttk, messagebox
 from services.habitacion_service import HabitacionService
 from pantallas.helpers.window_size_helper import WindowSizeHelper
+from PIL import Image
 
 class RegistrarHabitacion(ctk.CTkToplevel):
     def __init__(self, db):
@@ -15,89 +16,149 @@ class RegistrarHabitacion(ctk.CTkToplevel):
         self.title('Registrar Habitación')
 
         # Tamaño y configuración de la ventana
-        self.geometry("1080x800")  # Ajustar el tamaño
+        self.geometry("1080x800")
         self.minsize(1080, 800)
         self.maxsize(1080, 800)
 
+        # Configurar fondo con imagen
+        background_image = ctk.CTkImage(
+            Image.open("recursos/foto_fondo.jpg"),
+            size=(1080, 800)
+        )
+        bg_label = ctk.CTkLabel(self, image=background_image, text="")
+        bg_label.place(relwidth=1, relheight=1)
+
+        # Crear widgets estilizados
+        self.crear_widgets()
+
+    def crear_widgets(self):
+        # Frame principal transparente
+        frame = ctk.CTkFrame(self, fg_color="transparent", corner_radius=10)
+        frame.pack(fill="both", expand=True, padx=30, pady=30)
+
+        # Título principal con estilo
+        title_label = ctk.CTkLabel(
+            frame, text="Registrar Habitación",
+            font=ctk.CTkFont(size=22, weight="bold"),
+            text_color="white"
+        )
+        title_label.grid(row=0, column=0, columnspan=2, pady=(10, 20))
+
+        # Formulario de entrada
+        self._crear_campos(frame)
+
+        # Botón de registro
+        boton_registrar = ctk.CTkButton(
+            frame, text="Registrar Habitación",
+            command=self.registrar_o_modificar_habitacion,
+            font=ctk.CTkFont(size=16, weight="bold"),
+            fg_color="#3a3a3a",
+            hover_color="#1e90ff"
+        )
+        boton_registrar.grid(row=5, column=0, columnspan=2, pady=(30, 40))  # Espacio adicional
+
+        # Título para la tabla
+        tabla_label = ctk.CTkLabel(
+            frame, text="Listado de habitaciones",
+            font=ctk.CTkFont(size=18, weight="bold"),
+            text_color="white"
+        )
+        tabla_label.grid(row=6, column=0, columnspan=2, pady=(20, 10))  # Agregado antes de la tabla
+
+        # Tabla para mostrar habitaciones registradas
+        self._crear_tabla(frame)
+
+        # Botón "Volver al menú principal"
+        volver_button = ctk.CTkButton(
+            frame,
+            text="Volver",
+            command=self.volver_a_pantalla_principal,
+            font=ctk.CTkFont(size=16),
+            fg_color="#3a3a3a",
+            hover_color="#1e90ff"
+        )
+        volver_button.grid(row=8, column=0, columnspan=2, pady=(30, 10))
+
+        # Centrar ventana y actualizar tabla
+        self.update_idletasks()
+        self.after(5, lambda: WindowSizeHelper.centrar_ventana(self))
+        self.actualizar_tabla()
+
+    def _crear_campos(self, frame):
+        """Crea las etiquetas y campos de entrada del formulario."""
         self.tamanio_fuente = 14
         self.fuente = "Arial"
         self.width = 250
 
-        # Crear widgets con estilo y valores por defecto
-        self.crear_widgets()
+        # Registro de validaciones
+        vcmd_numero_habitacion = self.register(self.validar_rango)
+        vcmd_precio = self.register(self.validar_rango)
 
+        etiquetas_campos = [
+            ("Número de Habitación:", 1),
+            ("Tipo de Habitación:", 2),
+            ("Estado:", 3),
+            ("Precio por Noche:", 4),
+        ]
 
+        # Aplicamos la validación de número entero con 3 dígitos al campo de número de habitación
+        self.entry_numero = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente),
+                                         validate="key", validatecommand=(vcmd_numero_habitacion, "%P", 3))
+        self.combo_tipo = ctk.CTkComboBox(frame, values=["Simple", "Doble", "Suite"], width=self.width,
+                                          state='readonly')
+        self.combo_estado = ctk.CTkComboBox(frame, values=["Disponible", "Ocupada"], width=self.width, state='readonly')
+        self.entry_precio = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente),
+                                         validate="key", validatecommand=(vcmd_precio, "%P", 6))
 
-
-    def crear_widgets(self):
-        # Frame principal con padding adicional para una apariencia más espaciosa
-        frame = ctk.CTkFrame(self, corner_radius=10)
-        frame.pack(fill="both", expand=True, padx=30, pady=30)
-
-        # Titulo
-        ctk.CTkLabel(frame, text='Registrar Habitación', font=("Arial", 18)).grid(row=0, column=0, columnspan=2, pady=20)
-
-        # Etiquetas y campos de entrada
-        ctk.CTkLabel(frame, text="Número de Habitación:",
-                     font=(self.fuente, self.tamanio_fuente)
-                     ).grid(row=1, column=0, padx=10, pady=10)
-        self.entry_numero = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
-        self.entry_numero.grid(row=1, column=1, padx=10, pady=10)
-
-        ctk.CTkLabel(frame, text="Tipo de Habitación:",
-                     font=(self.fuente, self.tamanio_fuente)
-                     ).grid(row=2, column=0, padx=10, pady=10)
-        self.combo_tipo = ctk.CTkComboBox(frame, values=["Simple", "Doble", "Suite"]
-                                          , width=self.width, font=(self.fuente, self.tamanio_fuente), state='readonly')
-        self.combo_tipo.grid(row=2, column=1, padx=10, pady=10)
         self.combo_tipo.set("Seleccione un tipo")
-
-        ctk.CTkLabel(frame, text="Estado:",
-                     font=(self.fuente, self.tamanio_fuente)
-                     ).grid(row=3, column=0, padx=10, pady=10)
-        self.combo_estado = ctk.CTkComboBox(frame, values=["Disponible", "Ocupada"],
-                                            width=self.width, font=(self.fuente, self.tamanio_fuente), state='readonly')
-        self.combo_estado.grid(row=3, column=1, padx=10, pady=10)
         self.combo_estado.set("Seleccione un estado")
 
-        ctk.CTkLabel(frame, text="Precio por Noche:",
-                     font=(self.fuente, self.tamanio_fuente)
-                     ).grid(row=4, column=0, padx=10, pady=10)
-        self.entry_precio = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
-        self.entry_precio.grid(row=4, column=1, padx=10, pady=10)
+        widgets = [self.entry_numero, self.combo_tipo, self.combo_estado, self.entry_precio]
 
-        # Tabla para mostrar las habitaciones registradas
-        self.tabla_habitaciones = ttk.Treeview(frame, columns=("numero", "tipo", "estado", "precio"), show="headings")
+        for texto, fila in etiquetas_campos:
+            ctk.CTkLabel(
+                frame, text=texto,
+                font=(self.fuente, self.tamanio_fuente),
+                text_color="white"
+            ).grid(row=fila, column=0, padx=10, pady=10, sticky="e")
+            widgets[fila - 1].grid(row=fila, column=1, padx=10, pady=10)
+
+    # Validaciones
+    def validar_rango(self, valor, limite):
+        """Valida que el precio por noche sea numérico y no exceda el límite de caracteres."""
+        # Permitimos vacío para cuando el campo está vacío (no es obligatorio ingresar el valor de inmediato)
+        if valor == "":
+            return True
+
+        # Validamos que el valor sea numérico o que contenga un solo punto decimal
+        if valor.isdigit() and len(valor) <= int(limite):
+            # Se permite un solo punto decimal
+            return True
+
+        return False
+
+    def _crear_tabla(self, frame):
+        """Crea la tabla para mostrar habitaciones."""
+        self.tabla_habitaciones = ttk.Treeview(
+            frame, columns=("numero", "tipo", "estado", "precio"), show="headings"
+        )
         self.tabla_habitaciones.heading("numero", text="Número")
         self.tabla_habitaciones.heading("tipo", text="Tipo")
         self.tabla_habitaciones.heading("estado", text="Estado")
         self.tabla_habitaciones.heading("precio", text="Precio por Noche")
-        self.tabla_habitaciones.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
 
-        # asignar tamaño a cada columna
         self.tabla_habitaciones.column("numero", width=200)
         self.tabla_habitaciones.column("tipo", width=250)
         self.tabla_habitaciones.column("estado", width=250)
         self.tabla_habitaciones.column("precio", width=250)
 
-        # Botón para registrar la habitación
-        ctk.CTkButton(frame, text="Registrar Habitación", command=self.registrar_o_modificar_habitacion,
-                      font=(self.fuente, self.tamanio_fuente)
-                      ).grid(row=5, column=0, columnspan=2, pady=10)
-
-        # Centrar ventana después de ajustarse al contenido
-        self.update_idletasks()
-        self.after(5, lambda: WindowSizeHelper.centrar_ventana(self))
-
-        # Actualizar la tabla
-        self.actualizar_tabla()
-
+        self.tabla_habitaciones.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
 
     def registrar_o_modificar_habitacion(self):
+        """Lógica para registrar o modificar habitaciones."""
         numero = self.entry_numero.get()
         tipo = self.combo_tipo.get()
         estado = self.combo_estado.get()
-        # estado = "Disponible"
         precio = self.entry_precio.get()
 
         if not numero or not all(char.isdigit() for char in numero) or not (100 <= int(numero) <= 199):
@@ -105,62 +166,33 @@ class RegistrarHabitacion(ctk.CTkToplevel):
             return
 
         try:
-            habitacion_existente = None
             habitacion_existente = self.habitacion_service.get_by_id(numero)
-
-            if habitacion_existente != None:
-
+            if habitacion_existente:
                 self.modificar_habitacion(numero, tipo, estado, precio)
-
             else:
                 self.registrar_habitacion(numero, tipo, estado, precio)
             self.limpiar_campos()
-
         except Exception as e:
             messagebox.showerror('Error', f'No se pudo registrar la habitación: {e}')
 
-
     def registrar_habitacion(self, numero, tipo, estado, precio):
-        if tipo == "Seleccione un tipo" or estado == "Seleccione un estado":
-            messagebox.showerror("Error", "Debe seleccionar un tipo y un estado")
+        if tipo == "Seleccione un tipo" or estado == "Seleccione un estado" or not precio:
+            messagebox.showerror("Error", "Debe completar todos los campos")
             return
 
-        if not precio or not all(char.isdigit() for char in numero):
-            messagebox.showerror("Error", "Debe ingresar un precio valido para la nueva habitación")
-            return
-
-        habitacion_data = {
-            "numero": numero,
-            "tipo": tipo,
-            "estado": estado,
-            "precio": precio
-        }
-
-        self.habitacion_service.create(habitacion_data)
+        self.habitacion_service.create({"numero": numero, "tipo": tipo, "estado": estado, "precio": precio})
         messagebox.showinfo("Registro exitoso", "Habitación registrada correctamente")
+        self.actualizar_tabla()
 
     def modificar_habitacion(self, numero, tipo, estado, precio):
-
-        if tipo == "Seleccione un tipo" and estado == "Seleccione un estado":
-            messagebox.showerror("Error", "Debe seleccionar un tipo o un estado, para modificar una habitación")
-            return
-
         if tipo == "Seleccione un tipo":
             tipo = None
         if estado == "Seleccione un estado":
             estado = None
 
-
-        habitacion_data = {
-            "numero": numero,
-            "tipo": tipo,
-            "estado": estado,
-            "precio": precio
-        }
-
-        self.habitacion_service.update(numero, habitacion_data)
-        messagebox.showinfo("Modificacion exitosa", "Habitación modificada correctamente")
-
+        self.habitacion_service.update(numero, {"numero": numero, "tipo": tipo, "estado": estado, "precio": precio})
+        messagebox.showinfo("Modificación exitosa", "Habitación modificada correctamente")
+        self.actualizar_tabla()
 
     def actualizar_tabla(self):
         for row in self.tabla_habitaciones.get_children():
@@ -173,5 +205,7 @@ class RegistrarHabitacion(ctk.CTkToplevel):
         self.entry_precio.delete(0, "end")
         self.combo_tipo.set("Seleccione un tipo")
         self.combo_estado.set("Seleccione un estado")
-        self.actualizar_tabla()
 
+    def volver_a_pantalla_principal(self):
+        """Cierra la ventana actual y regresa a la pantalla principal."""
+        self.destroy()  # Cierra esta ventana

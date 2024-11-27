@@ -1,161 +1,183 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import customtkinter as ctk
-from tkinter import messagebox
-from pantallas.helpers.window_size_helper import WindowSizeHelper
+from PIL import Image
 from clases.cliente import Cliente
-
-
 from services.cliente_service import ClienteService
 
+
 class RegistrarCliente(ctk.CTkToplevel):
-    def __init__(self, db):
+    def __init__(self, db, pantalla_principal):
         super().__init__()
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
 
         self.db = db
+        self.pantalla_principal = pantalla_principal
         self.cliente_service = ClienteService(db)
         self.title('Registrar Cliente')
-        self.clientes = []
 
-        # Tamaño y configuración de la ventana
-        self.geometry("1100x800")  # Ajustar el tamaño
-        self.minsize(1100, 800)
-        self.maxsize(1100, 800)
+        # Fijar el tamaño de la ventana
+        self.geometry("1100x800")  # Tamaño de ventana ajustado a 1100x800
+        self.resizable(False, False)  # Tamaño fijo
 
-        self.tamaño_fuente = 14
-        self.fuente = "Arial"
-        self.width = 250
+        # Configurar fondo
+        self.configurar_fondo()
 
-        # Crear widgets con estilo y valores por defecto
+        # Crear widgets
         self.crear_widgets()
 
+    def configurar_fondo(self):
+        background_image = ctk.CTkImage(
+            Image.open("recursos/foto_fondo.jpg"),
+            size=(1100, 800)
+        )
+        self.bg_label = ctk.CTkLabel(self, image=background_image, text="")
+        self.bg_label.place(relwidth=1, relheight=1)
+
     def crear_widgets(self):
-        # Frame principal con padding adicional para una apariencia más espaciosa
-        frame = ctk.CTkFrame(self, corner_radius=10)
-        frame.pack(fill="both", expand=True, padx=30, pady=30)
+        # Frame principal
+        frame = ctk.CTkFrame(self, corner_radius=10, fg_color="transparent")
+        frame.pack(padx=20, pady=20, fill="both", expand=True)
 
-        # Titulo
-        ctk.CTkLabel(frame, text='Registrar Cliente', font=("Arial", 18)).grid(row=0, column=0, columnspan=2, pady=20)
+        # Título
+        ctk.CTkLabel(
+            frame, text="Registrar Cliente", font=("Arial", 22, "bold"), text_color="white"
+        ).pack(pady=(10, 20))
 
-        # Etiquetas y campos de entrada
-        ctk.CTkLabel(frame, text="Nombre:",
-                     font=(self.fuente, self.tamaño_fuente)
-                     ).grid(row=1, column=0, padx=10, pady=10)
-        self.entry_nombre = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamaño_fuente))
-        self.entry_nombre.grid(row=1, column=1, padx=10, pady=10)
+        # Formulario centrado
+        formulario_frame = ctk.CTkFrame(frame, fg_color="transparent")
+        formulario_frame.pack(pady=(0, 20), padx=20, expand=True)
 
-        ctk.CTkLabel(frame, text="Apellido:",
-                     font=(self.fuente, self.tamaño_fuente)
-                     ).grid(row=2, column=0, padx=10, pady=10)
-        self.entry_apellido = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamaño_fuente))
-        self.entry_apellido.grid(row=2, column=1, padx=10, pady=10)
+        # Configurar validaciones
+        vcmd_dni = self.register(self.validar_num_rango)
+        vcmd_texto = self.register(self.validar_texto)
 
-        ctk.CTkLabel(frame, text="Dirección:",
-                     font=(self.fuente, self.tamaño_fuente)
-                     ).grid(row=3, column=0, padx=10, pady=10)
-        self.entry_direccion = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamaño_fuente))
-        self.entry_direccion.grid(row=3, column=1, padx=10, pady=10)
+        # Campos de entrada
+        self.campos = {}
+        labels = ["Nro. Documento", "Nombre", "Apellido", "Dirección", "Teléfono", "Email"]
+        limites = {"Nro. Documento": 8, "Nombre": 50, "Apellido": 50, "Dirección": 100, "Teléfono": 15, "Email": 100}
+        for label_text in labels:
+            row_frame = ctk.CTkFrame(formulario_frame, fg_color="transparent")
+            row_frame.pack(fill="x", pady=5, anchor="center")
 
-        ctk.CTkLabel(frame, text="Teléfono:",
-                     font=(self.fuente, self.tamaño_fuente)
-                     ).grid(row=4, column=0, padx=10, pady=10)
-        self.entry_telefono = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamaño_fuente))
-        self.entry_telefono.grid(row=4, column=1, padx=10, pady=10)
+            ctk.CTkLabel(row_frame, text=label_text, font=("Arial", 14), text_color="white", width=140).pack(side="left")
 
-        ctk.CTkLabel(frame, text="Email:",
-                     font=(self.fuente, self.tamaño_fuente)
-                     ).grid(row=5, column=0, padx=10, pady=10)
-        self.entry_email = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamaño_fuente))
-        self.entry_email.grid(row=5, column=1, padx=10, pady=10)
+            # Validación por campo
+            if label_text == "Nro. Documento":
+                self.campos[label_text] = ctk.CTkEntry(
+                    row_frame, font=("Arial", 14), width=250,
+                    validate="key", validatecommand=(vcmd_dni, "%P", 9)
+                )
+            else:
+                self.campos[label_text] = ctk.CTkEntry(
+                    row_frame, font=("Arial", 14), width=250,
+                    validate="key", validatecommand=(vcmd_texto, "%P", limites[label_text])
+                )
+            self.campos[label_text].pack(side="left", padx=10)
 
-        # Tabla para mostrar los clientes registrados
-        self.tabla_clientes = ttk.Treeview(frame, columns=("id_cliente", "nombre", "apellido", "direccion", "telefono", "email"), show="headings")
+        # Botón para guardar cliente
+        boton_guardar = ctk.CTkButton(
+            frame, text="Guardar Cliente", command=self.guardar_cliente,
+            font=("Arial", 14), fg_color="gray", text_color="white", hover_color="#A9A9A9"
+        )
+        boton_guardar.pack(pady=(10, 20))
+
+        # Título de la tabla
+        ctk.CTkLabel(
+            frame, text="Listado de clientes", font=("Arial", 16, "bold"), text_color="white"
+        ).pack(pady=(10, 10))
+
+        # Tabla para mostrar clientes registrados
+        self.tabla_clientes = ttk.Treeview(
+            frame,
+            columns=("id_cliente", "nombre", "apellido", "direccion", "telefono", "email", "nro_documento"),
+            show="headings"
+        )
         self.tabla_clientes.heading("id_cliente", text="ID Cliente")
         self.tabla_clientes.heading("nombre", text="Nombre")
         self.tabla_clientes.heading("apellido", text="Apellido")
         self.tabla_clientes.heading("direccion", text="Dirección")
         self.tabla_clientes.heading("telefono", text="Teléfono")
         self.tabla_clientes.heading("email", text="Email")
-        self.tabla_clientes.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
+        self.tabla_clientes.heading("nro_documento", text="Nro. Documento")
+        self.tabla_clientes.pack(pady=10, fill="x", expand=True)
 
-        # Asignar tamaño a las columnas
-        self.tabla_clientes.column("id_cliente", width=100)
-        self.tabla_clientes.column("nombre", width=200)
-        self.tabla_clientes.column("apellido", width=200)
-        self.tabla_clientes.column("direccion", width=150)
-        self.tabla_clientes.column("telefono", width=150)
-        self.tabla_clientes.column("email", width=200)
-
-        # Botón de registro centrado
-        self.registrar_btn = ctk.CTkButton(frame, text='Registrar Cliente', command=self.registrar_cliente,
-                                      font=("Arial", 14), width=200, height=40)
-        self.registrar_btn.grid(row=6, column=0, columnspan=2, pady=30)
+        # Ajustar tamaño de columnas
+        for col in self.tabla_clientes["columns"]:
+            self.tabla_clientes.column(col, width=120)
 
         self.actualizar_tabla()
 
-        # Centrar ventana después de ajustarse al contenido
-        self.update_idletasks()
-        self.after(5, lambda: WindowSizeHelper.centrar_ventana(self))
+        # Botón de "Volver"
+        boton_volver = ctk.CTkButton(
+            frame, text="Volver", command=self.volver_a_pantalla_principal,
+            font=("Arial", 14), fg_color="gray", text_color="white", hover_color="#A9A9A9"
+        )
+        boton_volver.pack(pady=(10, 30))
 
-    def registrar_cliente(self):
+    def validar_num_rango(self, valor, limite):
+        """Valida que el dato ingresado sea numérico y no exceda el límite de caracteres."""
+        # Permitimos vacío para cuando el campo está vacío (no es obligatorio ingresar el valor de inmediato)
+        if valor == "":
+            return True
 
-        nombre = self.entry_nombre.get()
-        apellido = self.entry_apellido.get()
-        direccion = self.entry_direccion.get()
-        telefono = self.entry_telefono.get()
-        email = self.entry_email.get()
+        # Validamos que el valor sea numérico o que contenga un solo punto decimal
+        if valor.isdigit() and len(valor) <= int(limite):
+            # Se permite un solo punto decimal
+            return True
 
-        # Validaciones Simples
-        if not nombre or not all(char.isalpha() or char == ' ' for char in nombre):
-            messagebox.showerror("Error", "Campo Nombre vacío o incorrecto")
-            return
-        if not apellido or not all(char.isalpha() or char == ' ' for char in apellido):
-            messagebox.showerror("Error", "Campo Apellido vacío o incorrecto")
-            return
-        if not direccion:
-            messagebox.showerror("Error", "Campo Dirección vacío o incorrecto")
-            return
-        if not telefono or not all(char.isdigit() for char in telefono):
-            messagebox.showerror("Error", "Campo Teléfono vacío o incorrecto")
-            return
-        if not email or '@' not in email:
-            messagebox.showerror("Error", "Campo Email vacío o incorrecto")
-            return
+        return False
 
-        cliente_data = {
-            'nombre': nombre,
-            'apellido': apellido,
-            'direccion': direccion,
-            'telefono': telefono,
-            'email': email
+    def validar_texto(self, valor, limite):
+        """Valida que el texto no exceda el límite de caracteres."""
+        return len(valor) <= int(limite)
+
+    def guardar_cliente(self):
+        """Guarda un cliente en la base de datos."""
+        datos = {
+            "nro_documento": self.campos["Nro. Documento"].get(),
+            "nombre": self.campos["Nombre"].get(),
+            "apellido": self.campos["Apellido"].get(),
+            "direccion": self.campos["Dirección"].get(),
+            "telefono": self.campos["Teléfono"].get(),
+            "email": self.campos["Email"].get()
         }
 
+        if not all(datos.values()):
+            messagebox.showerror("Error", "Todos los campos son obligatorios")
+            return
+
         try:
-            # Logica de registro
-            self.cliente_service.create(cliente_data)
-            messagebox.showinfo('Registro exitoso', 'El cliente se ha registrado correctamente.')
+            self.cliente_service.create(datos)  # Pasar el diccionario de datos
+            messagebox.showinfo("Éxito", "Cliente registrado exitosamente")
+            self.actualizar_tabla()
             self.limpiar_campos()
-
-            print("Cliente registrado!")
         except Exception as e:
-            messagebox.showerror('Error', f'No se pudo registrar el cliente: {e}')
-
+            print(e)
+            messagebox.showerror("Error", f"Hubo un problema al guardar el cliente: {e}")
 
     def limpiar_campos(self):
-        self.entry_nombre.delete(0, "end")
-        self.entry_apellido.delete(0, "end")
-        self.entry_direccion.delete(0, "end")
-        self.entry_telefono.delete(0, "end")
-        self.entry_email.delete(0, "end")
+        """Limpia los campos del formulario y pone el foco en el primer campo."""
+        for campo in self.campos.values():
+            campo.delete(0, 'end')  # Elimina el texto dentro del campo
 
-        self.actualizar_tabla()
+        # Focalizamos el primer campo (Nro. Documento)
+        self.campos["Nro. Documento"].focus()
 
     def actualizar_tabla(self):
+        # Limpiar la tabla actual
         for row in self.tabla_clientes.get_children():
             self.tabla_clientes.delete(row)
-        for cliente in self.cliente_service.get_all():
-            self.tabla_clientes.insert("", "end", values=(cliente.id_cliente, cliente.nombre,
-                                                          cliente.apellido, cliente.direccion, cliente.telefono,
-                                                          cliente.email))
+
+        # Obtener todos los clientes desde el repositorio
+        clientes = self.cliente_service.get_all()
+
+        # Insertar los datos en la tabla
+        for cliente in clientes:
+            self.tabla_clientes.insert("", "end", values=(cliente.id_cliente, cliente.nombre, cliente.apellido,
+                                                          cliente.direccion, cliente.telefono, cliente.email, cliente.nro_documento))
+
+    def volver_a_pantalla_principal(self):
+        """Cierra la pantalla actual y regresa a la principal."""
+        self.destroy()
