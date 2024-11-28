@@ -38,7 +38,8 @@ class DBConnect:
                 direccion TEXT,
                 telefono TEXT,
                 email TEXT,
-                puntos_fidelizacion INTEGER DEFAULT 0
+                puntos_fidelizacion INTEGER DEFAULT 0,
+                puntos_fidelizacion_canjeados INTEGER DEFAULT 0
             )
         """)
 
@@ -52,6 +53,7 @@ class DBConnect:
                 sueldo REAL
             )
         """)
+
         # Tabla de habitaciones
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS habitaciones (
@@ -61,6 +63,7 @@ class DBConnect:
                 precio_por_noche REAL
             )
         """)
+
         # Tabla de reservas
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS reservas (
@@ -74,6 +77,7 @@ class DBConnect:
                 FOREIGN KEY(habitacion_numero) REFERENCES habitaciones(numero)
             )
         """)
+
         # Tabla de facturas
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS factura (
@@ -86,6 +90,7 @@ class DBConnect:
                 FOREIGN KEY(reserva_id) REFERENCES reservas(id_reserva)
             )
         """)
+
         # Nueva tabla para asignar empleados a habitaciones
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS empleados_habitaciones (
@@ -98,5 +103,6 @@ class DBConnect:
                 FOREIGN KEY(habitacion_numero) REFERENCES habitaciones(numero)
             )
         """)
+
         # Confirmar los cambios
         self.db.commit()

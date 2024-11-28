@@ -19,9 +19,9 @@ class ClienteRepository:
     def get_by_id(self, id):
         conn = self.db.get_db()
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM clientes WHERE id_cliente = ?', (id,))
+        cursor.execute('SELECT * FROM clientes WHERE nro_documento = ?', (id,))
         cliente_data = cursor.fetchone()
-        cliente = Cliente(id_cliente=cliente_data[0], nombre=cliente_data[1], apellido=cliente_data[2],direccion=cliente_data[3],telefono=cliente_data[4], email=cliente_data[5], nro_documento=cliente_data[6], puntos_fidelizacion=cliente_data[7], puntos_fidelizacion_canjeados=cliente_data[8])
+        cliente = Cliente(id_cliente=cliente_data[0], nro_documento=cliente_data[1], nombre=cliente_data[2], apellido=cliente_data[3],direccion=cliente_data[4],telefono=cliente_data[5], email=cliente_data[6], puntos_fidelizacion=cliente_data[7], puntos_fidelizacion_canjeados=cliente_data[8])
 
         return cliente
 
@@ -64,7 +64,7 @@ class ClienteRepository:
 
     def get_puntos(self, id_cliente):
         cursor = self.db.cursor()
-        query = "SELECT puntos_fidelizacion FROM clientes WHERE id_cliente = ?"
+        query = "SELECT puntos_fidelizacion FROM clientes WHERE nro_documento = ?"
         cursor.execute(query, (id_cliente,))
         result = cursor.fetchone()
         return result[0] if result else 0
@@ -84,6 +84,6 @@ class ClienteRepository:
 
     def actualizar_puntos_canjeados(self, id_cliente, puntos):
         cursor = self.db.cursor()
-        query = "UPDATE clientes SET puntos_fidelizacion_canjeados = ? WHERE id_cliente = ?"
+        query = "UPDATE clientes SET puntos_fidelizacion_canjeados = ? WHERE nro_documento = ?"
         cursor.execute(query, (puntos, id_cliente))
         self.db.commit()
