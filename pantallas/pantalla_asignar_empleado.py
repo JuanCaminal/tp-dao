@@ -119,7 +119,9 @@ class AsignarEmpleadoXHabitacion(ctk.CTkToplevel):
         self.tabla_asignaciones.column("tarea", width=450)
 
         # Botón para volver a la pantalla anterior
-        ctk.CTkButton(frame, text="Volver", command=self.destroy).grid(row=9, column=0, columnspan=2, pady=20)
+        ctk.CTkButton(frame, text="Volver", command=self.destroy,
+            font=("Arial", 14), fg_color="gray", text_color="white", hover_color="#A9A9A9"
+            ).grid(row=9, column=0, columnspan=2, pady=20)
 
         self.update_idletasks()
         self.after(5, lambda: WindowSizeHelper.centrar_ventana(self))

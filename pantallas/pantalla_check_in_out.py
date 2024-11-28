@@ -104,7 +104,9 @@ class CheckInOut(ctk.CTkToplevel):
         ctk.CTkButton(frame, text="Confirmar", command=self.confirmar_accion).pack(pady=10)
 
         # Botón para volver a la pantalla anterior
-        ctk.CTkButton(frame, text="Volver", command=self.destroy).pack(pady=10)
+        ctk.CTkButton(frame, text="Volver", command=self.destroy,
+                      font=("Arial", 14), fg_color="gray", text_color="white", hover_color="#A9A9A9"
+                      ).pack(pady=10)
 
         # Actualizar tabla inicial
         self.actualizar_tabla()

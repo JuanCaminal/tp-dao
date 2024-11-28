@@ -102,6 +102,11 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
         # Mostrar la tabla en el grid
         self.tabla_habitaciones.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
 
+        # Boton para volver
+        ctk.CTkButton(frame, text="Volver", command=self.destroy,
+                      font=("Arial", 14), fg_color="gray", text_color="white", hover_color="#A9A9A9"
+                      ).grid(row=8, column=0, columnspan=2, pady=25)
+
         self.update_idletasks()
         self.after(5, lambda: WindowSizeHelper.centrar_ventana(self))  # Centrar la ventana
 

@@ -100,7 +100,7 @@ class RegistrarEvento(ctk.CTkToplevel):
         ctk.CTkLabel(frame, text="Fecha de Evento (dd/mm/YYYY):",
                      font=(self.fuente, self.tamanio_fuente)
                      ).grid(row=3, column=0, rowspan=2, padx=10, pady=10)
-        self.entry_fecha_evento = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
+        self.entry_fecha_evento = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente), state="readonly")
         self.entry_fecha_evento.insert(0, self.fecha_actual())
         self.entry_fecha_evento.grid(row=3, column=1, padx=10, pady=10)
         self.open_calendar_fecha_entrada = ctk.CTkButton(frame, text="Seleccionar Fecha",
@@ -183,12 +183,10 @@ class RegistrarEvento(ctk.CTkToplevel):
         WindowSizeHelper.centrar_ventana(top)
 
     def select_date(self, cal, top, tipo_fecha):
-        if tipo_fecha == "fecha_evento":
-            self.entry_fecha_evento.delete(0, "end")
-            self.entry_fecha_evento.insert(0, cal.get_date())
-        else:
-            self.entry_fecha_evento.delete(0, "end")
-            self.entry_fecha_evento.insert(0, cal.get_date())
+        self.entry_fecha_evento.configure(state="normal")
+        self.entry_fecha_evento.delete(0, "end")
+        self.entry_fecha_evento.insert(0, cal.get_date())
+        self.entry_fecha_evento.configure(state="readonly")
         top.destroy()
 
     def fecha_actual(self):

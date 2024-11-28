@@ -41,15 +41,15 @@ class BuscarReservas(ctk.CTkToplevel):
     def crear_widgets(self):
         # Fondo con imagen
         self.fondo_imagen = Image.open("recursos/foto_logo.jpg")
-        self.fondo_imagen = self.fondo_imagen.resize((1100, 800), Image.ANTIALIAS)
+        self.fondo_imagen = self.fondo_imagen.resize((1100, 800), Image.LANCZOS)
         self.fondo_imagen = ImageTk.PhotoImage(self.fondo_imagen)
 
         fondo_label = tk.Label(self, image=self.fondo_imagen)
         fondo_label.place(relwidth=1, relheight=1)
 
         # Frame central donde se coloca todo el contenido
-        frame = ctk.CTkFrame(self, corner_radius=10, fg_color="transparent")
-        frame.place(relx=0.5, rely=0.5, anchor="center", width=900, height=600)
+        frame = ctk.CTkFrame(self, corner_radius=10, fg_color="transparent", width=800, height=600)
+        frame.place(relx=0.5, rely=0.5, anchor="center")
 
         # Titulo
         ctk.CTkLabel(frame, text='Buscar Reservas', font=("Arial", 18), text_color="white").grid(row=0, column=0,
@@ -58,7 +58,7 @@ class BuscarReservas(ctk.CTkToplevel):
         ctk.CTkLabel(frame, text="Fecha de Inicio (dd/mm/YYYY):", font=(self.fuente, self.tamanio_fuente),
                      text_color="white").grid(row=1, column=0, padx=10, pady=10)
 
-        self.entry_fecha_inicio = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
+        self.entry_fecha_inicio = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente), state="readonly")
         self.entry_fecha_inicio.insert(0, self.fecha_actual())
         self.entry_fecha_inicio.grid(row=1, column=1, padx=10, pady=10)
 
@@ -69,7 +69,7 @@ class BuscarReservas(ctk.CTkToplevel):
         ctk.CTkLabel(frame, text="Fecha de Salida (dd/mm/YYYY):", font=(self.fuente, self.tamanio_fuente),
                      text_color="white").grid(row=3, column=0, rowspan=1, padx=10, pady=10)
 
-        self.entry_fecha_fin = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
+        self.entry_fecha_fin = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente), state="readonly")
         self.entry_fecha_fin.grid(row=3, column=1, padx=10, pady=10)
 
         self.open_calendar_fecha_fin = ctk.CTkButton(frame, text="Seleccionar Fecha",
@@ -124,11 +124,15 @@ class BuscarReservas(ctk.CTkToplevel):
 
     def select_date(self, cal, top, tipo_fecha):
         if tipo_fecha == "fecha_entrada":
+            self.entry_fecha_inicio.configure(state="normal")
             self.entry_fecha_inicio.delete(0, "end")
             self.entry_fecha_inicio.insert(0, cal.get_date())
+            self.entry_fecha_inicio.configure(state="readonly")
         else:
+            self.entry_fecha_fin.configure(state="normal")
             self.entry_fecha_fin.delete(0, "end")
             self.entry_fecha_fin.insert(0, cal.get_date())
+            self.entry_fecha_fin.configure(state="readonly")
         top.destroy()
 
     def fecha_actual(self):
