@@ -2,13 +2,13 @@ import customtkinter as ctk
 from PIL import Image
 
 from pantallas.pantalla_asignar_empleado import AsignarEmpleadoXHabitacion
-from pantallas.pantalla_buscar_reservas import BuscarReservas
+from pantallas.pantalla_buscar_reservasAAAAAAAAAAAAAAAAAAAa import BuscarReservas
 from pantallas.pantalla_factura import EmitirFactura
 from pantallas.pantalla_registrar_cliente import RegistrarCliente
 from pantallas.pantalla_consultar_disponibilidad import ConsultarDisponibilidad
 from pantallas.pantalla_habitacion import RegistrarHabitacion
 from pantallas.pantalla_registrar_reserva import RegistrarReserva
-
+from pantallas.pantalla_check_in_out import CheckInOut
 from pantallas.helpers.window_size_helper import WindowSizeHelper
 from pantallas.pantalla_reportes import PantallaReportes
 
@@ -40,7 +40,7 @@ class PantallaPrincipal(ctk.CTk):
         # Reemplazar título con imagen
         title_image = ctk.CTkImage(
             Image.open("recursos/foto_logo.jpg"),  # Reemplaza con la ruta correcta
-            size=(150, 150)  # Ajusta el tamaño si es necesario
+            size=(150, 150 )  # Ajusta el tamaño si es necesario
         )
         title_label = ctk.CTkLabel(self, image=title_image, text="")
         title_label.pack(pady=(30, 20))  # Espaciado superior/inferior
@@ -63,10 +63,9 @@ class PantallaPrincipal(ctk.CTk):
             ("Registrar Habitación", self.abrir_registrar_habitacion, "white", "#3a3a3a"),
             ("Registrar Cliente", self.abrir_registrar_cliente, "white", "#3a3a3a"),
             ("Registrar Reserva", self.abrir_registrar_reserva, "white", "#3a3a3a"),
-            ("Registrar Factura", self.abrir_registrar_factura, "white", "#3a3a3a"),
+            ("Check In/Out", self.abrir_check_in_out, "white", "#3a3a3a"),
             ("Asignar Empleados a habitación", self.abrir_asignar_empleado, "white", "#3a3a3a"),
-            ("Consultar Disponibilidad de habitaciones", self.abrir_consultar_disponibilidad_habitaciones, "white",
-             "#3a3a3a"),
+            ("Consultar Disponibilidad de habitaciones", self.abrir_consultar_disponibilidad_habitaciones, "white", "#3a3a3a"),
             ("Generar Reportes", self.generar_reportes, "white", "#3a3a3a"),
             ("Salir", self.quit, "white", "#8B0000"),  # Rojo para el botón de salir
         ]
@@ -100,20 +99,20 @@ class PantallaPrincipal(ctk.CTk):
         registrar_habitacion.grab_set()
 
     def abrir_registrar_cliente(self):
-        registrar_cliente = RegistrarCliente(self.db, self)
+        registrar_cliente = RegistrarCliente(self.db, self)  # Agrega "self" como pantalla_principal
         registrar_cliente.grab_set()
 
     def abrir_registrar_reserva(self):
-        registrar_reserva = RegistrarReserva(self.db, self)
+        registrar_reserva = RegistrarReserva(self.db)
         registrar_reserva.grab_set()
 
-    def abrir_registrar_factura(self): #CHECK IN - CHECK OUT
-        registrar_factura = EmitirFactura(self.db)
-        registrar_factura.grab_set()
+    def abrir_check_in_out(self):
+        check_in_out = CheckInOut(self.db)
+        check_in_out.grab_set()
 
     def abrir_asignar_empleado(self):
         asignar_empleado_x_habitacion = AsignarEmpleadoXHabitacion(self.db)
-        asignar_empleado_x_habitacion.mainloop()
+        asignar_empleado_x_habitacion.grab_set()
 
     def abrir_consultar_disponibilidad_habitaciones(self):
         consultar_disponibilidad = ConsultarDisponibilidad(self.db)
@@ -126,3 +125,4 @@ class PantallaPrincipal(ctk.CTk):
     def quit(self):
         self.db.close_db()
         super().quit()
+

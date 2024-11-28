@@ -1,6 +1,5 @@
 class Cliente:
-    def __init__(self, nombre, apellido, direccion, telefono, email, nro_documento, id_cliente=None,
-                 puntos_fidelizacion=0):
+    def __init__(self, nombre, apellido, direccion, telefono, email, nro_documento, id_cliente=None, puntos_fidelizacion=0, puntos_fidelizacion_canjeados=0):
         self._id_cliente = id_cliente
         self._nombre = nombre
         self._apellido = apellido
@@ -9,6 +8,7 @@ class Cliente:
         self._email = email
         self._nro_documento = nro_documento
         self._puntos_fidelizacion = puntos_fidelizacion
+        self._puntos_fidelizacion_canjeados = puntos_fidelizacion_canjeados
 
     def str(self):
         return f'Cliente {self.nombre} {self.apellido} - ID: {self.id_cliente}'
@@ -77,3 +77,11 @@ class Cliente:
     @puntos_fidelizacion.setter
     def puntos_fidelizacion(self, puntos):
         self._puntos_fidelizacion = puntos
+
+    @property
+    def puntos_fidelizacion_canjeados(self):
+        return self._puntos_fidelizacion_canjeados
+
+    @puntos_fidelizacion.setter
+    def puntos_fidelizacion_canjeados(self, puntos):
+        self._puntos_fidelizacion_canjeados = puntos

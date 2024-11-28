@@ -1,12 +1,12 @@
 import datetime
 
 class Factura:
-    def __init__(self, id_factura, cliente, reserva, fecha_emision):
+    def __init__(self, id_factura, cliente, reserva, fecha_emision, total):
         self._id_factura = id_factura
         self._cliente = cliente
         self._reserva = reserva
         self._fecha_emision = fecha_emision
-        self._total = self.calcular_total()
+        self._total = total
 
     def calcular_total(self):
         noches = self._reserva.duracion_estancia()

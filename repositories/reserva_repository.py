@@ -1,4 +1,5 @@
 from clases.reserva import Reserva
+from datetime import datetime
 
 class ReservaRepository:
     def __init__(self, db):
@@ -44,6 +45,50 @@ class ReservaRepository:
                 fecha_salida=data[4],
                 cantidad_personas=data[5]
             )
+            for data in reservas_data
+        ]
+
+        return reservas
+
+    def get_reserva_chek_in_out(self, id_reserva=None):
+        cursor = self.db.cursor()
+        fecha_actual = datetime.now().strftime("%d/%m/%Y")  # Obtener la fecha de hoy
+
+        # Consulta SQL para incluir el estado de la habitación
+        query = """
+                    SELECT 
+                        r.id_reserva, 
+                        c.nro_documento AS dni_cliente, 
+                        r.habitacion_numero, 
+                        r.fecha_entrada, 
+                        r.fecha_salida, 
+                        r.cantidad_personas,
+                        h.estado AS estado_habitacion
+                    FROM reservas r
+                    INNER JOIN clientes c ON r.cliente_id = c.id_cliente
+                    INNER JOIN habitaciones h ON r.habitacion_numero = h.numero
+                    WHERE ? BETWEEN r.fecha_entrada AND r.fecha_salida
+                """
+        params = [fecha_actual]
+
+        # Agregar filtro opcional por id_reserva
+        if id_reserva:
+            query += " AND r.id_reserva = ?"
+            params.append(id_reserva)
+
+        cursor.execute(query, params)
+        reservas_data = cursor.fetchall()
+
+        # Crear lista de reservas junto con el estado de la habitación
+        reservas = [
+            (Reserva(
+                id_reserva=data[0],
+                cliente=data[1],  # DNI del cliente
+                habitacion=data[2],
+                fecha_entrada=data[3],
+                fecha_salida=data[4],
+                cantidad_personas=data[5]
+            ), data[6])  # data[6] es el estado de la habitación
             for data in reservas_data
         ]
 

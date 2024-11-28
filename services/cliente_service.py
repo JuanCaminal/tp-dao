@@ -20,7 +20,8 @@ class ClienteService:
             telefono=cliente_data["telefono"],
             email=cliente_data["email"],
             nro_documento=cliente_data["nro_documento"],
-            puntos_fidelizacion=0
+            puntos_fidelizacion=0,
+            puntos_fidelizacion_canjeados=0
         )
         return self.cliente_repository.create(cliente)
 
@@ -34,7 +35,8 @@ class ClienteService:
             telefono=cliente_data["telefono"],
             email=cliente_data["email"],
             nro_documento=cliente_data["nro_documento"],
-            puntos_fidelizacion=cliente_data["puntos_fidelizacion"]
+            puntos_fidelizacion=cliente_data["puntos_fidelizacion"],
+            puntos_fidelizacion_canjeados=cliente_data["puntos_fidelizacion_canjeados"]
         )
         return self.cliente_repository.update(id, cliente)
 
@@ -49,9 +51,12 @@ class ClienteService:
 
     def canjear_puntos(self, id_cliente, puntos_a_canjear):
         puntos_actuales = self.cliente_repository.get_puntos(id_cliente)
+        puntos_actuales_canjeados = self.cliente_repository.get_puntos_canjeados(id_cliente)
         if puntos_actuales >= puntos_a_canjear:
             nuevos_puntos = puntos_actuales - puntos_a_canjear
+            nuevos_puntos_canjeados = puntos_actuales_canjeados + puntos_a_canjear
             self.cliente_repository.actualizar_puntos(id_cliente, nuevos_puntos)
+            self.cliente_repository.actualizar_puntos_canjeados(id_cliente, nuevos_puntos_canjeados)
             return nuevos_puntos
         else:
             raise ValueError("Puntos insuficientes para canjear.")
