@@ -90,6 +90,10 @@ class RegistrarHabitacion(ctk.CTkToplevel):
         self.fuente = "Arial"
         self.width = 250
 
+        # Registro de validaciones
+        vcmd_numero_habitacion = self.register(self.validar_rango)
+        vcmd_precio = self.register(self.validar_rango)
+
         etiquetas_campos = [
             ("Número de Habitación:", 1),
             ("Tipo de Habitación:", 2),
@@ -97,10 +101,14 @@ class RegistrarHabitacion(ctk.CTkToplevel):
             ("Precio por Noche:", 4),
         ]
 
-        self.entry_numero = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
-        self.combo_tipo = ctk.CTkComboBox(frame, values=["Simple", "Doble", "Suite"], width=self.width)
-        self.combo_estado = ctk.CTkComboBox(frame, values=["Disponible", "Ocupada"], width=self.width)
-        self.entry_precio = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
+        # Aplicamos la validación de número entero con 3 dígitos al campo de número de habitación
+        self.entry_numero = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente),
+                                         validate="key", validatecommand=(vcmd_numero_habitacion, "%P", 3))
+        self.combo_tipo = ctk.CTkComboBox(frame, values=["Simple", "Doble", "Suite"], width=self.width,
+                                          state='readonly')
+        self.combo_estado = ctk.CTkComboBox(frame, values=["Disponible", "Ocupada"], width=self.width, state='readonly')
+        self.entry_precio = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente),
+                                         validate="key", validatecommand=(vcmd_precio, "%P", 6))
 
         self.combo_tipo.set("Seleccione un tipo")
         self.combo_estado.set("Seleccione un estado")
@@ -114,6 +122,20 @@ class RegistrarHabitacion(ctk.CTkToplevel):
                 text_color="white"
             ).grid(row=fila, column=0, padx=10, pady=10, sticky="e")
             widgets[fila - 1].grid(row=fila, column=1, padx=10, pady=10)
+
+    # Validaciones
+    def validar_rango(self, valor, limite):
+        """Valida que el precio por noche sea numérico y no exceda el límite de caracteres."""
+        # Permitimos vacío para cuando el campo está vacío (no es obligatorio ingresar el valor de inmediato)
+        if valor == "":
+            return True
+
+        # Validamos que el valor sea numérico o que contenga un solo punto decimal
+        if valor.isdigit() and len(valor) <= int(limite):
+            # Se permite un solo punto decimal
+            return True
+
+        return False
 
     def _crear_tabla(self, frame):
         """Crea la tabla para mostrar habitaciones."""
@@ -132,7 +154,6 @@ class RegistrarHabitacion(ctk.CTkToplevel):
 
         self.tabla_habitaciones.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
 
-    # Métodos originales para lógica de negocio
     def registrar_o_modificar_habitacion(self):
         """Lógica para registrar o modificar habitaciones."""
         numero = self.entry_numero.get()
@@ -140,8 +161,8 @@ class RegistrarHabitacion(ctk.CTkToplevel):
         estado = self.combo_estado.get()
         precio = self.entry_precio.get()
 
-        if not numero:
-            messagebox.showerror("Error", "Debe seleccionar el número de habitación")
+        if not numero or not all(char.isdigit() for char in numero) or not (100 <= int(numero) <= 199):
+            messagebox.showerror("Error", "Debe seleccionar el número de habitación (Entre 100 y 199)")
             return
 
         try:

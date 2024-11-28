@@ -3,6 +3,14 @@ from tkinter import messagebox
 from PIL import Image, ImageTk  # Para manejar imágenes de fondo
 
 from pantallas.pantalla_buscar_reservas import BuscarReservas
+
+from pantallas.pantalla_asignar_empleado import AsignarEmpleadoXHabitacion
+from pantallas.pantalla_buscar_reservasAAAAAAAAAAAAAAAAAAAa import BuscarReservas
+from pantallas.pantalla_registrar_cliente import RegistrarCliente
+from pantallas.pantalla_consultar_disponibilidad import ConsultarDisponibilidad
+from pantallas.pantalla_habitacion import RegistrarHabitacion
+from pantallas.pantalla_registrar_reserva import RegistrarReserva
+
 from pantallas.helpers.window_size_helper import WindowSizeHelper
 from services.reporte_service import ReporteService
 
@@ -73,8 +81,10 @@ class PantallaReportes(ctk.CTkToplevel):
             messagebox.showerror('Error', f'No se pudo generar el reporte: {e}')
 
     def generar_reporte_ocupacion_promedio(self):
+        """Llama al servicio para generar el reporte de ocupación promedio."""
         try:
             self.reporte_service.generar_reporte_ocupacion_promedio()
+
             messagebox.showinfo("Reporte exitoso", "Reporte de ocupación promedio generado con éxito")
         except Exception as e:
             messagebox.showerror('Error', f'No se pudo generar el reporte: {e}')

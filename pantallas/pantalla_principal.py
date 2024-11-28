@@ -100,7 +100,7 @@ class PantallaPrincipal(ctk.CTk):
         registrar_habitacion.grab_set()
 
     def abrir_registrar_cliente(self):
-        registrar_cliente = RegistrarCliente(self.db, self)  # Agrega "self" como pantalla_principal
+        registrar_cliente = RegistrarCliente(self.db, self)
         registrar_cliente.grab_set()
 
     def abrir_registrar_reserva(self):

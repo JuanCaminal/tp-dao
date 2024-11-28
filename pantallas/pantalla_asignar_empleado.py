@@ -195,13 +195,22 @@ class AsignarEmpleadoXHabitacion(ctk.CTkToplevel):
 
         for asignacion in self.empleado_service.get_all_asignaciones():
             empleado = self.empleado_service.get_by_id(asignacion.empleado_id)
-            habitacion = self.habitacion_service.get_by_id(asignacion.habitacion_id)
-            self.tabla_asignaciones.insert("", "end", values=(asignacion.id_asignacion, empleado.nombre_completo(),
-                                                              habitacion.numero, asignacion.fecha_asignacion, asignacion.tarea))
+            habitacion = self.habitacion_service.get_by_id(asignacion.habitacion_numero)
+            self.tabla_asignaciones.insert("", "end", values=(
+                asignacion.id_asignacion,
+                f"{empleado.nombre} {empleado.apellido}",
+                f"{habitacion.numero} - {habitacion.tipo}",
+                asignacion.fecha_asignacion,
+                asignacion.tarea
+            ))
 
     def limpiar_campos(self):
         self.combo_empleado.set("Seleccione un empleado")
         self.combo_habitacion.set("Seleccione una habitación")
         self.entry_fecha_asignacion.delete(0, "end")
+        nueva_fecha = self.fecha_actual()
+        self.entry_fecha_asignacion.insert(0, nueva_fecha)
         self.entry_tarea.delete(0, "end")
         self.actualizar_tabla()
+
+
