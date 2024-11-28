@@ -11,6 +11,5 @@ def main():
 
     db.close_db()
 
-
 if __name__ == '__main__':
     main()
