@@ -3,7 +3,6 @@ import customtkinter as ctk
 from tkinter import ttk, messagebox
 from datetime import datetime
 from reportes.factura_Service_2 import generar_factura
-from selenium.webdriver.common.devtools.v85.inspector import enable
 
 from repositories.cliente_repository import ClienteRepository
 from repositories.reserva_repository import ReservaRepository

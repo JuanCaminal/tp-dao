@@ -180,11 +180,15 @@ class RegistrarReserva(ctk.CTkToplevel):
 
     def select_date(self, cal, top, tipo_fecha):
         if tipo_fecha == "fecha_entrada":
+            self.entry_fecha_entrada.configure(state='normal')  # Cambiar a editable
             self.entry_fecha_entrada.delete(0, "end")
             self.entry_fecha_entrada.insert(0, cal.get_date())
+            self.entry_fecha_entrada.configure(state='readonly')  # Volver a readonly
         else:
+            self.entry_fecha_salida.configure(state='normal')  # Cambiar a editable
             self.entry_fecha_salida.delete(0, "end")
             self.entry_fecha_salida.insert(0, cal.get_date())
+            self.entry_fecha_salida.configure(state='readonly')  # Volver a readonly
         top.destroy()
 
     def fecha_actual(self):
