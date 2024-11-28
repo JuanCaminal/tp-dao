@@ -58,7 +58,7 @@ class DBConnect:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS habitaciones (
                 numero INTEGER PRIMARY KEY,
-                tipo TEXT CHECK(tipo IN ('Simple', 'Doble', 'Suite')) NOT NULL,
+                tipo TEXT CHECK(tipo IN ('Simple', 'Doble', 'Suite', 'Salon')) NOT NULL,
                 estado TEXT CHECK(estado IN ('Disponible', 'Ocupada')) NOT NULL,
                 precio_por_noche REAL
             )

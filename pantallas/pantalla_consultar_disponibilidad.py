@@ -21,7 +21,7 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
         # Tamaño y configuración de la ventana
         self.geometry("700x800")  # Ajustar el tamaño
         self.minsize(700, 800)
-        self.maxsize(700, 800)
+        self.maxsize(1000, 800)
 
         self.tamanio_fuente = 14
         self.fuente = "Arial"
@@ -72,7 +72,7 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
         self.open_calendar_fecha_fin.grid(row=4, column=1, padx=10, pady=10)
 
         # Tabla para mostrar las habitaciones disponibles
-        self.tabla_habitaciones = ttk.Treeview(frame, columns=("numero", "tipo", "estado", "precio_por_noche"),
+        self.tabla_habitaciones = ttk.Treeview(frame, columns=("numero", "tipo", "estado", "precio_por_noche", "fecha_disponible_desde", "fecha_disponible_hasta"),
                                                show="headings")
 
         # Configurar los encabezados de la tabla
@@ -80,12 +80,16 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
         self.tabla_habitaciones.heading("tipo", text="Tipo")
         self.tabla_habitaciones.heading("estado", text="Estado")
         self.tabla_habitaciones.heading("precio_por_noche", text="Precio por Noche")
+        self.tabla_habitaciones.heading("fecha_disponible_desde", text="Fecha disponible desde")
+        self.tabla_habitaciones.heading("fecha_disponible_hasta", text="Fecha disponible hasta")
 
         # Asignar tamaño a cada columna
         self.tabla_habitaciones.column("numero", width=100)
         self.tabla_habitaciones.column("tipo", width=150)
         self.tabla_habitaciones.column("estado", width=180)
         self.tabla_habitaciones.column("precio_por_noche", width=150)
+        self.tabla_habitaciones.column("fecha_disponible_desde", width=150)
+        self.tabla_habitaciones.column("fecha_disponible_hasta", width=150)
 
         # Botón para buscar reserva
         ctk.CTkButton(frame, text="Buscar Habitaciones", command=self.buscar_habitaciones_disponibles).grid(row=6, column=0,
@@ -159,4 +163,9 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
 
         # Insertar las habitaciones disponibles en la tabla
         for habitacion in habitaciones_disponibles:
-            self.tabla_habitaciones.insert("", "end", values=(habitacion.numero, habitacion.tipo, habitacion.estado, habitacion.precio_por_noche))
+            self.tabla_habitaciones.insert("", "end", values=(habitacion["habitacion"].numero,
+                                                              habitacion["habitacion"].tipo,
+                                                              habitacion["habitacion"].estado,
+                                                              habitacion["habitacion"].precio_por_noche,
+                                                              habitacion["fecha_disponible_desde"],
+                                                              habitacion["fecha_disponible_hasta"]))
