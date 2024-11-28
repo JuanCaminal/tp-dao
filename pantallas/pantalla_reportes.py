@@ -13,6 +13,7 @@ from pantallas.pantalla_registrar_reserva import RegistrarReserva
 
 from pantallas.helpers.window_size_helper import WindowSizeHelper
 from services.reporte_service import ReporteService
+from reportes.reporte_ocupacion_promedio import generar_reporte_ocupacion_promedio
 
 
 class PantallaReportes(ctk.CTkToplevel):
@@ -83,8 +84,7 @@ class PantallaReportes(ctk.CTkToplevel):
     def generar_reporte_ocupacion_promedio(self):
         """Llama al servicio para generar el reporte de ocupación promedio."""
         try:
-            self.reporte_service.generar_reporte_ocupacion_promedio()
-
+            generar_reporte_ocupacion_promedio(self, tipo='Simple', estado='ocupada')
             messagebox.showinfo("Reporte exitoso", "Reporte de ocupación promedio generado con éxito")
         except Exception as e:
             messagebox.showerror('Error', f'No se pudo generar el reporte: {e}')

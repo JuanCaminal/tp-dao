@@ -2,14 +2,17 @@ import tkinter as tk
 import customtkinter as ctk
 from tkinter import ttk, messagebox
 from datetime import datetime
-
+from reportes.factura_Service_2 import generar_factura
 from selenium.webdriver.common.devtools.v85.inspector import enable
 
+from repositories.cliente_repository import ClienteRepository
 from repositories.reserva_repository import ReservaRepository
 from repositories.habitacion_repository import HabitacionRepository
 from repositories.factura_repositoy import FacturaRepository
 from clases.factura import Factura
 from services.cliente_service import ClienteService
+
+from PIL import Image, ImageTk
 
 
 class CheckInOut(ctk.CTkToplevel):
@@ -23,6 +26,11 @@ class CheckInOut(ctk.CTkToplevel):
         self.geometry("1100x800")
         self.minsize(1100, 800)
 
+        # Cargar imagen de fondo
+        self.bg_image = ctk.CTkImage(Image.open("recursos/foto_fondo.jpg"), size=(1100, 800))
+        self.bg_label = ctk.CTkLabel(self, image=self.bg_image)
+        self.bg_label.place(relx=0.5, rely=0.5, anchor="center")
+
         # Variables para la lógica
         self.opciones_combobox = ["Check-In", "Check-Out"]
         self.estado_actual = tk.StringVar(value=self.opciones_combobox[0])  # Estado inicial: Check-In
@@ -32,9 +40,23 @@ class CheckInOut(ctk.CTkToplevel):
         # Crear widgets de la interfaz
         self.crear_widgets()
 
+
+    def validar_num_rango(self, valor, limite):
+        """Valida que el dato ingresado sea numérico y no exceda el límite de caracteres."""
+        # Permitimos vacío para cuando el campo está vacío (no es obligatorio ingresar el valor de inmediato)
+        if valor == "":
+            return True
+
+        # Validamos que el valor sea numérico o que contenga un solo punto decimal
+        if valor.isdigit() and len(valor) <= int(limite):
+            # Se permite un solo punto decimal
+            return True
+
+        return False
+
     def crear_widgets(self):
         frame = ctk.CTkFrame(self, corner_radius=10)
-        frame.pack(fill="both", expand=True, padx=30, pady=30)
+        frame.pack(fill="both", expand=False, padx=30, pady=30)
 
         # Título
         ctk.CTkLabel(frame, text="Check-In y Check-Out", font=("Arial", 18)).pack(pady=20)
@@ -42,27 +64,30 @@ class CheckInOut(ctk.CTkToplevel):
         # Combobox para seleccionar Check-In o Check-Out
         ctk.CTkLabel(frame, text="Seleccione una opción:", font=("Arial", 14)).pack(pady=5)
         self.combobox_estado = ctk.CTkComboBox(frame, values=self.opciones_combobox, variable=self.estado_actual,
-                                               font=("Arial", 14))
+                                               font=("Arial", 14), state='readonly')
         self.combobox_estado.pack(pady=5)
-        self.combobox_estado.bind("<<ComboboxSelected>>", self.actualizar_tabla)  # Actualizar tabla según selección
+        self.combobox_estado.bind("<<ComboboxSelected>>", self.actualizar_tabla)
+
+        # Campo para filtrar por DNI
+        vcmd_dni = self.register(self.validar_num_rango)
 
         # Campo para filtrar por DNI
         ctk.CTkLabel(frame, text="Filtrar por DNI:", font=("Arial", 14)).pack(pady=10)
         filtro_frame = ctk.CTkFrame(frame, corner_radius=0)
         filtro_frame.pack(pady=5)
-        ctk.CTkEntry(filtro_frame, textvariable=self.dni_filtro, width=300, font=("Arial", 14)).pack(side="left",
-                                                                                                     padx=5)
-        ctk.CTkButton(filtro_frame, text="Buscar", command=self.actualizar_tabla).pack(side="left", padx=5)
+        ctk.CTkEntry(filtro_frame, textvariable=self.dni_filtro, width=300, font=("Arial", 14), validate="key",
+                     validatecommand=(vcmd_dni, "%P", 8)).pack(side="left",
+                                                               padx=5)
 
         # Tabla para mostrar las reservas
         self.tabla_reservas = ttk.Treeview(frame, columns=("id_reserva", "cliente", "habitacion", "fecha", "estado"),
-                                           show="headings")
+                                           show="headings", height=10)  # Limitar la altura
         self.tabla_reservas.heading("id_reserva", text="ID Reserva")
         self.tabla_reservas.heading("cliente", text="Cliente")
         self.tabla_reservas.heading("habitacion", text="Habitación")
         self.tabla_reservas.heading("fecha", text="Fecha")
         self.tabla_reservas.heading("estado", text="Estado")
-        self.tabla_reservas.pack(fill="both", expand=True, pady=20)
+        self.tabla_reservas.pack(fill="x", pady=20)  # Evitar que se expanda verticalmente
 
         # Ajustar columnas
         self.tabla_reservas.column("id_reserva", width=100)
@@ -73,17 +98,20 @@ class CheckInOut(ctk.CTkToplevel):
 
         # Checkbox para usar puntos de descuento
         self.checkbox_puntos = ctk.CTkCheckBox(frame, text="Usar puntos de descuento", variable=self.usar_puntos,
-                                                font=("Arial", 14))
+                                               font=("Arial", 14))
         self.checkbox_puntos.pack(pady=10)
 
         # Botón para confirmar la acción
         ctk.CTkButton(frame, text="Confirmar", command=self.confirmar_accion).pack(pady=10)
 
+        # Botón para volver a la pantalla anterior
+        ctk.CTkButton(frame, text="Volver", command=self.destroy).pack(pady=10)
+
         # Actualizar tabla inicial
         self.actualizar_tabla()
 
     def fecha_actual(self):
-        return datetime.now().strftime("%d/%m/%Y")
+        return datetime.now().date().strftime("%Y-%m-%d")
 
     def actualizar_tabla(self, event=None):
         # Limpiar la tabla
@@ -112,7 +140,8 @@ class CheckInOut(ctk.CTkToplevel):
         elif estado == "Check-Out":
             reservas_con_estado = [
                 (reserva, estado_habitacion) for reserva, estado_habitacion in reservas_con_estado
-                if (reserva.fecha_salida < fecha_actual or reserva.fecha_entrada <= fecha_actual and reserva.fecha_salida >= fecha_actual) and estado_habitacion == "Ocupada"
+                if (
+                           reserva.fecha_salida < fecha_actual or reserva.fecha_entrada <= fecha_actual and reserva.fecha_salida >= fecha_actual) and estado_habitacion == "Ocupada"
             ]
 
         # Filtrar por DNI si se especifica
@@ -128,23 +157,6 @@ class CheckInOut(ctk.CTkToplevel):
                 reserva.id_reserva, reserva.cliente, reserva.habitacion,
                 reserva.fecha_entrada, reserva.fecha_salida, estado
             ))
-
-    def simular_consulta(self, estado, dni):
-        # Esto es un ejemplo simulado, reemplazar con tu lógica real
-        reservas_ejemplo = [
-            {"id": 1, "cliente": "Juan Pérez", "habitacion": "101", "fecha": "27/11/2024", "estado": "Disponible"},
-            {"id": 2, "cliente": "Ana Gómez", "habitacion": "102", "fecha": "27/11/2024", "estado": "Ocupada"},
-        ]
-
-        if estado == "Check-In":
-            reservas = [r for r in reservas_ejemplo if r["estado"] == "Disponible"]
-        else:
-            reservas = [r for r in reservas_ejemplo if r["estado"] == "Ocupada"]
-
-        if dni:
-            reservas = [r for r in reservas if dni in r["cliente"]]
-
-        return reservas
 
     def confirmar_accion(self):
         try:
@@ -185,7 +197,6 @@ class CheckInOut(ctk.CTkToplevel):
                 reserva_repo = ReservaRepository(self.db)
                 reserva_data = reserva_repo.get_reserva_chek_in_out(id_reserva=reserva[0])
 
-
                 if reserva_data:
                     reserva_obj, _ = reserva_data[0]
 
@@ -193,26 +204,41 @@ class CheckInOut(ctk.CTkToplevel):
                     habitacion = habitacion_repo.get_by_id(reserva_obj.habitacion)
                     if habitacion:
                         # Calcular el total de la factura (precio por noche * cantidad de noches)
-                        noches = (datetime.strptime(reserva_obj.fecha_salida, '%d/%m/%Y') - datetime.strptime(reserva_obj.fecha_entrada,'%d/%m/%Y')).days
+                        noches = (datetime.strptime(reserva_obj.fecha_salida, "%Y-%m-%d") - datetime.strptime(
+                            reserva_obj.fecha_entrada, "%Y-%m-%d")).days
 
                         dict_habitaciones = {
                             'Simple': 5,
                             'Doble': 10,
-                            'Suite': 20
+                            'Suite': 20,
+                            'Salon': 50
                         }
                         tipo_habitacion = habitacion.tipo
                         puntos_habitacion = dict_habitaciones.get(tipo_habitacion)
                         cliente_sv = ClienteService(self.db)
-                        cliente_sv.acumular_puntos(id_cliente=reserva[1], puntos=puntos_habitacion * noches)
-                        total_factura = (habitacion.precio_por_noche * noches) - (puntos_habitacion * noches if check_box_puntos else 0)
+                        cliente_sv.acumular_puntos(id_cliente=reserva[1], puntos=(
+                            puntos_habitacion * noches if noches > 0 else puntos_habitacion))
+                        cliente_repo = ClienteRepository(self.db)
+                        total_puntos = cliente_repo.get_puntos(id_cliente=reserva[1])
+                        puntos_menor_que_precio = True if total_puntos <= habitacion.precio_por_noche * noches else False
+                        if puntos_menor_que_precio:
+                            cliente_sv.canjear_puntos(id_cliente=reserva[1],
+                                                      puntos_a_canjear=total_puntos) if check_box_puntos else ''
+                        total_factura = (
+                                            habitacion.precio_por_noche * noches if noches else habitacion.precio_por_noche) - (
+                                            total_puntos if check_box_puntos and puntos_menor_que_precio else 0)
 
+                        if self.fecha_actual() < (reserva[4]):
+                            reserva_a_modificar = reserva_repo.get_by_id(reserva[0])
+                            reserva_a_modificar.fecha_salida = self.fecha_actual()
+                            reserva_repo.update(reserva[0], reserva_a_modificar)
                         # Crear la factura
                         factura = Factura(
                             id_factura=None,  # El ID se generará automáticamente
                             cliente=reserva_obj.cliente,
                             reserva=reserva_obj.id_reserva,
-                            fecha_emision=datetime.now().strftime("%d/%m/%Y"),
-                            total=total_factura # Asignamos el total calculado a la factura
+                            fecha_emision=datetime.now().date().strftime("%Y-%m-%d"),
+                            total=total_factura  # Asignamos el total calculado a la factura
                         )
 
                         # Insertar la factura en la base de datos
@@ -221,6 +247,15 @@ class CheckInOut(ctk.CTkToplevel):
 
                         # Si la factura se creó correctamente
                         if factura_id:
+                            nombre_cliente = cliente_repo.get_by_dni(dni=reserva[1])
+                            descripcion_factura = f'Estadia Habitación {tipo_habitacion}'
+                            item = [habitacion.numero, descripcion_factura, float(habitacion.precio_por_noche),
+                                    float(total_factura)]
+                            generar_factura(facturar_a=f'{nombre_cliente.nombre} {nombre_cliente.apellido}',
+                                            numero_factura=factura_id, fecha=self.fecha_actual(),
+                                            fecha_vencimiento=self.fecha_actual(), items=[item],
+                                            subtotal=float(total_factura),
+                                            iva=21.00, total=float(total_factura*1.21))
                             # Actualizar el estado de la habitación a "Disponible"
                             habitacion.estado = "Disponible"
                             filas_actualizadas = habitacion_repo.update(reserva_obj.habitacion, habitacion)
@@ -245,4 +280,3 @@ class CheckInOut(ctk.CTkToplevel):
 
         except Exception as e:
             messagebox.showerror("Error", f"Error al realizar la acción: {e}")
-

@@ -16,14 +16,14 @@ from tkcalendar import DateEntry, Calendar
 
 
 
-class RegistrarReserva(ctk.CTkToplevel):
+class RegistrarEvento(ctk.CTkToplevel):
     def __init__(self, db, pantalla_principal):
         super().__init__()
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
 
         self.db = db
-        self.title('Registrar Reserva')
+        self.title('Registrar Evento')
 
         # Tamaño y configuración de la ventana
         self.geometry("1100x800")
@@ -59,7 +59,7 @@ class RegistrarReserva(ctk.CTkToplevel):
         canvas.create_window(550, 300, window=frame, width=1000, height=550, anchor="center")
 
         # Título
-        ctk.CTkLabel(frame, text='Registrar Reserva', font=("Arial", 18)).grid(row=0, column=0, columnspan=2, pady=20)
+        ctk.CTkLabel(frame, text='Registrar Evento', font=("Arial", 18)).grid(row=0, column=0, columnspan=2, pady=20)
 
         # Etiquetas y campos de entrada
 
@@ -68,68 +68,57 @@ class RegistrarReserva(ctk.CTkToplevel):
                      ).grid(row=1, column=0, padx=10, pady=10)
         self.combo_cliente = ctk.CTkComboBox(frame, values=[f"{cliente.nombre} {cliente.apellido}" for cliente in
                                                             self.clientes]
-                                             , width=self.width, font=(self.fuente, self.tamanio_fuente), state='readonly')
+                                             , width=self.width, font=(self.fuente, self.tamanio_fuente), )
         self.combo_cliente.grid(row=1, column=1, padx=10, pady=10)
         self.combo_cliente.set("Seleccione un cliente")
 
-        ctk.CTkLabel(frame, text="Habitación:",
+        ctk.CTkLabel(frame, text="Salon:",
                      font=(self.fuente, self.tamanio_fuente,)
                      ).grid(row=2, column=0, padx=10, pady=10)
         self.combo_habitacion = ctk.CTkComboBox(frame,
                                                 values=[f"{habitacion.numero} - {habitacion.tipo}" for habitacion in
-                                                        self.habitaciones]
-                                                , width=self.width, font=(self.fuente, self.tamanio_fuente), state='readonly')
+                                                        self.habitaciones
+                                                        if habitacion.tipo=='Salon']
+                                                , width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.combo_habitacion.grid(row=2, column=1, padx=10, pady=10)
-        self.combo_habitacion.set("Seleccione una habitación")
+        self.combo_habitacion.set("Seleccione un salon")
 
-        ctk.CTkLabel(frame, text="Fecha de Entrada (dd/mm/YYYY):",
+        ctk.CTkLabel(frame, text="Fecha de Evento (dd/mm/YYYY):",
                      font=(self.fuente, self.tamanio_fuente)
                      ).grid(row=3, column=0, rowspan=2, padx=10, pady=10)
-        self.entry_fecha_entrada = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente), state='readonly')
-        self.entry_fecha_entrada.insert(0, self.fecha_actual())
-        self.entry_fecha_entrada.grid(row=3, column=1, padx=10, pady=10)
+        self.entry_fecha_evento = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
+        self.entry_fecha_evento.insert(0, self.fecha_actual())
+        self.entry_fecha_evento.grid(row=3, column=1, padx=10, pady=10)
         self.open_calendar_fecha_entrada = ctk.CTkButton(frame, text="Seleccionar Fecha",
-                                                         command=lambda: self.open_calendar("fecha_entrada"))
+                                                         command=lambda: self.open_calendar("fecha_evento"))
         self.open_calendar_fecha_entrada.grid(row=4, column=1, padx=10, pady=10)
 
-        ctk.CTkLabel(frame, text="Fecha de Salida (dd/mm/YYYY):",
-                     font=(self.fuente, self.tamanio_fuente)).grid(row=5, column=0, rowspan=2, padx=10, pady=10)
-        self.entry_fecha_salida = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente), state='readonly')
-        self.entry_fecha_salida.grid(row=5, column=1, padx=10, pady=10)
-
-        self.open_calendar_fecha_salida = ctk.CTkButton(frame, text="Seleccionar Fecha",
-                                                        command=lambda: self.open_calendar("fecha_salida"))
-        self.open_calendar_fecha_salida.grid(row=6, column=1, padx=10, pady=10)
-
-        validar_cantidad= self.register(self.validar_num_rango)
 
         ctk.CTkLabel(frame, text="Cantidad de Personas:",
                      font=(self.fuente, self.tamanio_fuente)
                      ).grid(row=7, column=0, padx=10, pady=10)
-        self.entry_cantidad_personas = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente), validatecommand= (validar_cantidad,"%P", 2))
+        self.entry_cantidad_personas = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.entry_cantidad_personas.grid(row=7, column=1, padx=10, pady=10)
 
         # Botón para registrar reserva
-        ctk.CTkButton(frame, text="Registrar Reserva", command=self.registrar_reserva).grid(row=8, column=0,
+        ctk.CTkButton(frame, text="Registrar Evento", command=self.registrar_reserva).grid(row=8, column=0,
                                                                                             columnspan=2, pady=10)
 
         # Tabla para mostrar las reservas registradas
         self.tabla_reservas = ttk.Treeview(frame, columns=(
-            "id_reserva", "cliente", "habitacion", "fecha_entrada", "fecha_salida", "cantidad_personas"),
+            "id_reserva", "cliente", "salon", "fecha_evento", "cantidad_personas"),
                                            show="headings")
 
         self.tabla_reservas.heading("id_reserva", text="ID Reserva")
         self.tabla_reservas.heading("cliente", text="Cliente")
-        self.tabla_reservas.heading("habitacion", text="Habitación")
-        self.tabla_reservas.heading("fecha_entrada", text="Fecha de Entrada")
-        self.tabla_reservas.heading("fecha_salida", text="Fecha de Salida")
+        self.tabla_reservas.heading("salon", text="Salon")
+        self.tabla_reservas.heading("fecha_evento", text="Fecha Evento")
         self.tabla_reservas.heading("cantidad_personas", text="Personas")
 
         self.tabla_reservas.column("id_reserva", width=80, anchor="center")
         self.tabla_reservas.column("cliente", width=200, anchor="center")
-        self.tabla_reservas.column("habitacion", width=200, anchor="center")
-        self.tabla_reservas.column("fecha_entrada", width=140, anchor="center")
-        self.tabla_reservas.column("fecha_salida", width=140, anchor="center")
+        self.tabla_reservas.column("salon", width=200, anchor="center")
+        self.tabla_reservas.column("fecha_evento", width=140, anchor="center")
         self.tabla_reservas.column("cantidad_personas", width=100, anchor="center")
 
         self.tabla_reservas.grid(row=9, column=0, columnspan=2, padx=20, pady=10, sticky="nsew")
@@ -179,39 +168,24 @@ class RegistrarReserva(ctk.CTkToplevel):
         WindowSizeHelper.centrar_ventana(top)
 
     def select_date(self, cal, top, tipo_fecha):
-        if tipo_fecha == "fecha_entrada":
-            self.entry_fecha_entrada.delete(0, "end")
-            self.entry_fecha_entrada.insert(0, cal.get_date())
+        if tipo_fecha == "fecha_evento":
+            self.entry_fecha_evento.delete(0, "end")
+            self.entry_fecha_evento.insert(0, cal.get_date())
         else:
-            self.entry_fecha_salida.delete(0, "end")
-            self.entry_fecha_salida.insert(0, cal.get_date())
+            self.entry_fecha_evento.delete(0, "end")
+            self.entry_fecha_evento.insert(0, cal.get_date())
         top.destroy()
 
     def fecha_actual(self):
         return datetime.now().strftime("%d/%m/%Y")
 
-    def validar_num_rango(self, valor, limite):
-        """Valida que el dato ingresado sea numérico y no exceda el límite de caracteres."""
-        # Permitimos vacío para cuando el campo está vacío (no es obligatorio ingresar el valor de inmediato)
-        if valor == "":
-            return True
-
-        # Validamos que el valor sea numérico o que contenga un solo punto decimal
-        if valor.isdigit() and len(valor) <= int(limite):
-            # Se permite un solo punto decimal
-            return True
-
-        return False
-
-
     def registrar_reserva(self):
         cliente_nombre = self.combo_cliente.get()
         habitacion_nro_tipo = self.combo_habitacion.get()
-        fecha_entrada = self.entry_fecha_entrada.get()
-        fecha_salida = self.entry_fecha_salida.get()
+        fecha_entrada = self.entry_fecha_evento.get()
         cantidad_personas = self.entry_cantidad_personas.get()
 
-        if cliente_nombre == "Seleccione un cliente" or habitacion_nro_tipo == "Seleccione una habitación" or fecha_entrada == "" or fecha_salida == "" or cantidad_personas == "":
+        if cliente_nombre == "Seleccione un cliente" or habitacion_nro_tipo == "Seleccione un salon" or fecha_entrada == "" or cantidad_personas == "":
             messagebox.showerror("Error", "Por favor complete todos los campos")
             return
 
@@ -225,16 +199,7 @@ class RegistrarReserva(ctk.CTkToplevel):
         habitacion_tipo = habitacion_nro_tipo.split(" - ")[1]
 
         fecha_entrada = datetime.strptime(fecha_entrada, "%d/%m/%Y").strftime("%Y-%m-%d")
-        fecha_salida = datetime.strptime(fecha_salida, "%d/%m/%Y").strftime("%Y-%m-%d")
 
-        # Validar fechas y validar que la cantidad de personas no exceda la que permite la habitacion
-        if fecha_entrada > fecha_salida:
-            messagebox.showerror("Error", "Por favor ingrese una fecha válida")
-            return
-
-        if fecha_entrada < (datetime.strptime(self.fecha_actual(), "%d/%m/%Y").strftime("%Y-%m-%d")):
-            messagebox.showerror("Error", "Por favor ingrese una fecha posterior a la fecha actual")
-            return
 
         # Obtener el tipo de habitacion
         match habitacion_tipo.lower():
@@ -250,12 +215,16 @@ class RegistrarReserva(ctk.CTkToplevel):
                 if int(cantidad_personas) > 4:
                     messagebox.showerror("Error", "Por favor ingrese una cantidad de personas valida")
                     return
+            case "salon":
+                if int(cantidad_personas) > 100:
+                    messagebox.showerror("Error", "Por favor, intentelo de nuevo. La capacidad del salon es de 100 personas.")
+                    return
             case _:
                 print("Tipo de habitación no valida")
                 messagebox.showerror("Error", "Lo sentimos ocurrio un error de base de datos")
                 return
 
-        if not self.verificar_disponibilidad_habitacion(habitacion_nro, fecha_entrada, fecha_salida):
+        if not self.verificar_disponibilidad_habitacion(habitacion_nro, fecha_entrada, (datetime.strptime(self.fecha_actual(), "%d/%m/%Y").strftime("%Y-%m-%d"))):
             messagebox.showinfo("Habitacion ocupada",
                                 "La habitacion no esta disponible en la fecha solicitada. \n Por favor, seleccione otra habitacion o seleccione una fecha distinta. ")
             return
@@ -264,7 +233,7 @@ class RegistrarReserva(ctk.CTkToplevel):
             "cliente": cliente_id,
             "habitacion": habitacion_nro,
             "fecha_entrada": fecha_entrada,
-            "fecha_salida": fecha_salida,
+            "fecha_salida": (datetime.strptime(self.fecha_actual(), "%d/%m/%Y").strftime("%Y-%m-%d")),
             "cantidad_personas": cantidad_personas
         }
 
@@ -278,10 +247,9 @@ class RegistrarReserva(ctk.CTkToplevel):
     def limpiar_campos(self):
         self.combo_cliente.set("Seleccione un cliente")
         self.combo_habitacion.set("Seleccione una habitación")
-        self.entry_fecha_entrada.delete(0, "end")
+        self.entry_fecha_evento.delete(0, "end")
         nueva_fecha = self.fecha_actual()
-        self.entry_fecha_entrada.insert(0, nueva_fecha)
-        self.entry_fecha_salida.delete(0, "end")
+        self.entry_fecha_evento.insert(0, nueva_fecha)
         self.entry_cantidad_personas.delete(0, "end")
         self.actualizar_tabla()
 

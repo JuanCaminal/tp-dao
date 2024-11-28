@@ -4,6 +4,7 @@ import customtkinter as ctk
 from PIL import Image
 from clases.cliente import Cliente
 from services.cliente_service import ClienteService
+import re
 
 
 class RegistrarCliente(ctk.CTkToplevel):
@@ -51,6 +52,9 @@ class RegistrarCliente(ctk.CTkToplevel):
 
         # Configurar validaciones
         vcmd_dni = self.register(self.validar_num_rango)
+        vcmd_telefono = self.register(self.validar_num_rango)
+        vcmd_direccion = self.register(self.validar_direccion)
+        vcmd_email = self.register(self.validar_email)
         vcmd_texto = self.register(self.validar_texto)
 
         # Campos de entrada
@@ -61,7 +65,8 @@ class RegistrarCliente(ctk.CTkToplevel):
             row_frame = ctk.CTkFrame(formulario_frame, fg_color="transparent")
             row_frame.pack(fill="x", pady=5, anchor="center")
 
-            ctk.CTkLabel(row_frame, text=label_text, font=("Arial", 14), text_color="white", width=140).pack(side="left")
+            ctk.CTkLabel(row_frame, text=label_text, font=("Arial", 14), text_color="white", width=140).pack(
+                side="left")
 
             # Validación por campo
             if label_text == "Nro. Documento":
@@ -69,6 +74,25 @@ class RegistrarCliente(ctk.CTkToplevel):
                     row_frame, font=("Arial", 14), width=250,
                     validate="key", validatecommand=(vcmd_dni, "%P", 8)
                 )
+
+            elif label_text == "Teléfono":
+                self.campos[label_text] = ctk.CTkEntry(
+                    row_frame, font=("Arial", 14), width=250,
+                    validate="key", validatecommand=(vcmd_telefono, "%P", 15)
+                )
+
+            elif label_text == "Dirección":
+                self.campos[label_text] = ctk.CTkEntry(
+                    row_frame, font=("Arial", 14), width=250,
+                    validate="key", validatecommand=(vcmd_direccion, "%P", 100)
+                )
+
+            elif label_text == "Email":
+                self.campos[label_text] = ctk.CTkEntry(
+                    row_frame, font=("Arial", 14), width=250,
+                    validate="key", validatecommand=(vcmd_email, "%P", 150)
+                )
+
             else:
                 self.campos[label_text] = ctk.CTkEntry(
                     row_frame, font=("Arial", 14), width=250,
@@ -130,9 +154,25 @@ class RegistrarCliente(ctk.CTkToplevel):
 
         return False
 
+    def validar_direccion(self, valor, limite):
+        """Valida que la dirección permita texto, números, y caracteres comunes, respetando el límite."""
+        if valor == "":  # Permitir campo vacío
+            return True
+        return all(c.isalnum() or c in " ,.-" for c in valor) and len(valor) <= int(limite)
+
+    def validar_email(self, valor, limite):
+        """Valida que el email tenga un formato correcto, permita caracteres alfanuméricos, y respete el límite."""
+        if valor == "":  # Permitir campo vacío
+            return True
+        # Regex para validar un email básico
+        patron = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        return re.match(patron, valor) and len(valor) <= int(limite)
+
     def validar_texto(self, valor, limite):
-        """Valida que el texto no exceda el límite de caracteres."""
-        return len(valor) <= int(limite)
+        """Valida que el texto solo contenga letras, espacios, y caracteres acentuados, respetando el límite."""
+        if valor == "":  # Permitir campo vacío
+            return True
+        return all(c.isalpha() or c.isspace() for c in valor) and len(valor) <= int(limite)
 
     def guardar_cliente(self):
         """Guarda un cliente en la base de datos."""
@@ -145,8 +185,15 @@ class RegistrarCliente(ctk.CTkToplevel):
             "email": self.campos["Email"].get()
         }
 
+        # Validar que todos los campos tengan valores
         if not all(datos.values()):
             messagebox.showerror("Error", "Todos los campos son obligatorios")
+            return
+
+        # Validación de email: verificar que contenga un arroba
+        email = datos["email"]
+        if "@" not in email or "." not in email:
+            messagebox.showerror("Error", "El campo Email debe contener un arroba '@' o agregar el dominio.")
             return
 
         try:
@@ -177,7 +224,8 @@ class RegistrarCliente(ctk.CTkToplevel):
         # Insertar los datos en la tabla
         for cliente in clientes:
             self.tabla_clientes.insert("", "end", values=(cliente.id_cliente, cliente.nombre, cliente.apellido,
-                                                          cliente.direccion, cliente.telefono, cliente.email, cliente.nro_documento, cliente.puntos_fidelizacion))
+                                                          cliente.direccion, cliente.telefono, cliente.email,
+                                                          cliente.nro_documento, cliente.puntos_fidelizacion))
 
     def volver_a_pantalla_principal(self):
         """Cierra la pantalla actual y regresa a la principal."""

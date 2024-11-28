@@ -30,17 +30,18 @@ class DBConnect:
         cursor = self.db.cursor()
 
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS clientes (
-                id_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
-                nro_documento TEXT UNIQUE NOT NULL,
-                nombre TEXT NOT NULL,
-                apellido TEXT NOT NULL,
-                direccion TEXT,
-                telefono TEXT,
-                email TEXT,
-                puntos_fidelizacion INTEGER DEFAULT 0
-            )
-        """)
+                    CREATE TABLE IF NOT EXISTS clientes (
+                        id_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
+                        nro_documento TEXT UNIQUE NOT NULL,
+                        nombre TEXT NOT NULL,
+                        apellido TEXT NOT NULL,
+                        direccion TEXT,
+                        telefono TEXT,
+                        email TEXT,
+                        puntos_fidelizacion INTEGER DEFAULT 0,
+                        puntos_fidelizacion_canjeados INTEGER DEFAULT 0
+                    )
+                """)
 
         # Tabla de empleados
         cursor.execute("""

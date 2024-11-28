@@ -11,6 +11,7 @@ from pantallas.pantalla_registrar_reserva import RegistrarReserva
 from pantallas.pantalla_check_in_out import CheckInOut
 from pantallas.helpers.window_size_helper import WindowSizeHelper
 from pantallas.pantalla_reportes import PantallaReportes
+from pantallas.pantalla_gestion_eventos import RegistrarEvento
 
 
 class PantallaPrincipal(ctk.CTk):
@@ -64,6 +65,7 @@ class PantallaPrincipal(ctk.CTk):
             ("Registrar Cliente", self.abrir_registrar_cliente, "white", "#3a3a3a"),
             ("Registrar Reserva", self.abrir_registrar_reserva, "white", "#3a3a3a"),
             ("Check In/Out", self.abrir_check_in_out, "white", "#3a3a3a"),
+            ("Registrar Eventos", self.abrir_gestion_eventos, "white", "#3a3a3a"),
             ("Asignar Empleados a habitación", self.abrir_asignar_empleado, "white", "#3a3a3a"),
             ("Consultar Disponibilidad de habitaciones", self.abrir_consultar_disponibilidad_habitaciones, "white", "#3a3a3a"),
             ("Generar Reportes", self.generar_reportes, "white", "#3a3a3a"),
@@ -103,11 +105,15 @@ class PantallaPrincipal(ctk.CTk):
         registrar_cliente.grab_set()
 
     def abrir_registrar_reserva(self):
-        registrar_reserva = RegistrarReserva(self.db)
+        registrar_reserva = RegistrarReserva(self.db, self)
         registrar_reserva.grab_set()
 
     def abrir_check_in_out(self):
         check_in_out = CheckInOut(self.db)
+        check_in_out.grab_set()
+
+    def abrir_gestion_eventos(self):
+        check_in_out = RegistrarEvento(self.db,self)
         check_in_out.grab_set()
 
     def abrir_asignar_empleado(self):

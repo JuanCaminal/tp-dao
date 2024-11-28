@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 from tkcalendar import DateEntry, Calendar  # Importar DateEntry
 import customtkinter as ctk
 from datetime import datetime
+from PIL import Image  # Asegúrate de tener la librería PIL instalada
 
 from pantallas.helpers.window_size_helper import WindowSizeHelper
 from services.habitacion_service import HabitacionService
@@ -33,27 +34,34 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
         self.habitaciones = self.habitacion_service.get_all()
 
         # Crear widgets con estilo y valores por defecto
+        self.crear_fondo()  # Agregar el fondo a la ventana
         self.crear_widgets()
 
+    def crear_fondo(self):
+        """Agregar un fondo con una imagen y ubicarlo en la capa más baja."""
+        fondo_imagen = ctk.CTkImage(Image.open("recursos/foto_fondo.jpg"), size=(700, 800))  # Cambia la ruta al fondo
+        fondo_label = ctk.CTkLabel(self, image=fondo_imagen, text="")
+        fondo_label.image = fondo_imagen  # Mantener referencia
+        fondo_label.place(x=0, y=0, relwidth=1, relheight=1)
+
     def crear_widgets(self):
-        # Frame principal con padding adicional para una apariencia más espaciosa
-        frame = ctk.CTkFrame(self, corner_radius=10)
+        # Frame principal transparente
+        frame = ctk.CTkFrame(self, corner_radius=10, fg_color="transparent")
         frame.pack(fill="both", expand=True, padx=30, pady=30)
 
         # Titulo
         ctk.CTkLabel(frame, text='Consultar Disponibilidad Habitaciones', font=("Arial", 18)).grid(row=0, column=0, columnspan=2, pady=20)
 
-
+        # ComboBox para seleccionar habitación
         self.combo_habitacion = ctk.CTkComboBox(frame,
                                                 values=[f"{habitacion.numero} - {habitacion.tipo}" for habitacion in
-                                                        self.habitaciones]
-                                                , width=self.width, font=(self.fuente, self.tamanio_fuente))
+                                                        self.habitaciones],
+                                                width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.combo_habitacion.grid(row=1, column=1, padx=10, pady=10)
         self.combo_habitacion.set("Seleccione una habitación")
 
         ctk.CTkLabel(frame, text="Fecha de Inicio (dd/mm/YYYY):",
-                     font=(self.fuente, self.tamanio_fuente)
-                     ).grid(row=1, column=0, padx=10, pady=10)
+                     font=(self.fuente, self.tamanio_fuente)).grid(row=1, column=0, padx=10, pady=10)
 
         self.entry_fecha_inicio = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.entry_fecha_inicio.insert(0, self.fecha_actual())
@@ -63,7 +71,7 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
         self.open_calendar_fecha_inicio.grid(row=2, column=1, padx=10, pady=10)
 
         ctk.CTkLabel(frame, text="Fecha de Salida (dd/mm/YYYY):",
-                     font=(self.fuente, self.tamanio_fuente)).grid(row=3, column=0, rowspan=1, padx=10, pady=10)
+                     font=(self.fuente, self.tamanio_fuente)).grid(row=3, column=0, padx=10, pady=10)
         self.entry_fecha_fin = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
         self.entry_fecha_fin.grid(row=3, column=1, padx=10, pady=10)
 
@@ -96,7 +104,6 @@ class ConsultarDisponibilidad(ctk.CTkToplevel):
 
         self.update_idletasks()
         self.after(5, lambda: WindowSizeHelper.centrar_ventana(self))  # Centrar la ventana
-
 
     def fecha_actual(self):
         return datetime.now().strftime("%d/%m/%Y")

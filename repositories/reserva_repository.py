@@ -52,7 +52,7 @@ class ReservaRepository:
 
     def get_reserva_chek_in_out(self, id_reserva=None):
         cursor = self.db.cursor()
-        fecha_actual = datetime.now().strftime("%d/%m/%Y")  # Obtener la fecha de hoy
+        fecha_actual = datetime.now().date().strftime("%Y-%m-%d")  # Obtener la fecha de hoy
 
         # Consulta SQL para incluir el estado de la habitación
         query = """
