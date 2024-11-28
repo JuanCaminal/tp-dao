@@ -81,7 +81,7 @@ class PantallaPrincipal(ctk.CTk):
                 hover_color=hover_color,
                 corner_radius=10, height=50, width=400
             )
-            boton.pack(pady=15)  # Espaciado entre botones
+            boton.pack(pady=10)  # Espaciado entre botones
 
         # Ajustar automáticamente la imagen de fondo al tamaño de la ventana
         self.bind("<Configure>", lambda e: self.adjust_background(background_image))
@@ -131,4 +131,3 @@ class PantallaPrincipal(ctk.CTk):
     def quit(self):
         self.db.close_db()
         super().quit()
-

@@ -56,7 +56,7 @@ class RegistrarReserva(ctk.CTkToplevel):
 
         # Frame principal encima del fondo
         frame = ctk.CTkFrame(self, corner_radius=10, bg_color="transparent")
-        canvas.create_window(550, 300, window=frame, width=1000, height=550, anchor="center")
+        canvas.create_window(550, 350, window=frame, width=1000, height=650, anchor="center")
 
         # Título
         ctk.CTkLabel(frame, text='Registrar Reserva', font=("Arial", 18)).grid(row=0, column=0, columnspan=2, pady=20)

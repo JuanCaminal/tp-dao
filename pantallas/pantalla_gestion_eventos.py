@@ -45,6 +45,20 @@ class RegistrarEvento(ctk.CTkToplevel):
         # Crear widgets con estilo y valores por defecto
         self.crear_widgets()
 
+    def validar_num_rango(self, valor, limite):
+        """Valida que el dato ingresado sea numérico y no exceda el límite de caracteres."""
+        # Permitimos vacío para cuando el campo está vacío (no es obligatorio ingresar el valor de inmediato)
+        if valor == "":
+            return True
+
+        # Validamos que el valor sea numérico o que contenga un solo punto decimal
+        if valor.isdigit() and len(valor) <= int(limite):
+            # Se permite un solo punto decimal
+            return True
+
+        return False
+
+
     def crear_widgets(self):
         # Imagen de fondo
         canvas = Canvas(self, width=1100, height=800)
@@ -68,7 +82,7 @@ class RegistrarEvento(ctk.CTkToplevel):
                      ).grid(row=1, column=0, padx=10, pady=10)
         self.combo_cliente = ctk.CTkComboBox(frame, values=[f"{cliente.nombre} {cliente.apellido}" for cliente in
                                                             self.clientes]
-                                             , width=self.width, font=(self.fuente, self.tamanio_fuente), )
+                                             , width=self.width, font=(self.fuente, self.tamanio_fuente), state='readonly')
         self.combo_cliente.grid(row=1, column=1, padx=10, pady=10)
         self.combo_cliente.set("Seleccione un cliente")
 
@@ -79,7 +93,7 @@ class RegistrarEvento(ctk.CTkToplevel):
                                                 values=[f"{habitacion.numero} - {habitacion.tipo}" for habitacion in
                                                         self.habitaciones
                                                         if habitacion.tipo=='Salon']
-                                                , width=self.width, font=(self.fuente, self.tamanio_fuente))
+                                                , width=self.width, font=(self.fuente, self.tamanio_fuente), state='readonly')
         self.combo_habitacion.grid(row=2, column=1, padx=10, pady=10)
         self.combo_habitacion.set("Seleccione un salon")
 
@@ -93,11 +107,12 @@ class RegistrarEvento(ctk.CTkToplevel):
                                                          command=lambda: self.open_calendar("fecha_evento"))
         self.open_calendar_fecha_entrada.grid(row=4, column=1, padx=10, pady=10)
 
+        validar_cantidad = self.register(self.validar_num_rango)
 
         ctk.CTkLabel(frame, text="Cantidad de Personas:",
                      font=(self.fuente, self.tamanio_fuente)
                      ).grid(row=7, column=0, padx=10, pady=10)
-        self.entry_cantidad_personas = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente))
+        self.entry_cantidad_personas = ctk.CTkEntry(frame, width=self.width, font=(self.fuente, self.tamanio_fuente), validatecommand= (validar_cantidad,"%P", 2))
         self.entry_cantidad_personas.grid(row=7, column=1, padx=10, pady=10)
 
         # Botón para registrar reserva
